@@ -5,10 +5,53 @@ Browser is kept visible so the user can handle captchas manually.
 """
 
 import logging
+import re
+import shutil
+import subprocess
 import undetected_chromedriver as uc
-from selenium.webdriver.chrome.options import Options
 
 logger = logging.getLogger(__name__)
+
+CHROME_PATHS = [
+    # Linux
+    "/usr/bin/google-chrome",
+    "/usr/bin/google-chrome-stable",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+    "/snap/bin/chromium",
+    # macOS
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    # Windows (via shutil.which fallback below)
+]
+
+
+def _get_chrome_major_version(binary: str) -> int:
+    """Return the major version number of the Chrome binary (e.g. 145)."""
+    try:
+        out = subprocess.check_output([binary, "--version"], stderr=subprocess.DEVNULL).decode()
+        match = re.search(r"(\d+)\.\d+\.\d+", out)
+        if match:
+            return int(match.group(1))
+    except Exception:
+        pass
+    return 0
+
+
+def _find_chrome() -> str:
+    import os
+    for path in CHROME_PATHS:
+        if os.path.isfile(path):
+            return path
+    found = (
+        shutil.which("google-chrome")
+        or shutil.which("google-chrome-stable")
+        or shutil.which("chromium")
+        or shutil.which("chromium-browser")
+        # Windows
+        or shutil.which("chrome")
+    )
+    return found or ""
 
 
 def build_driver(anti_bot: dict = None) -> uc.Chrome:
@@ -41,8 +84,21 @@ def build_driver(anti_bot: dict = None) -> uc.Chrome:
     if "user_agent" in anti_bot:
         options.add_argument(f"--user-agent={anti_bot['user_agent']}")
 
+    chrome_binary = _find_chrome()
+    version_main = None
+    if chrome_binary:
+        options.binary_location = chrome_binary
+        version_main = _get_chrome_major_version(chrome_binary) or None
+        logger.info(f"Using Chrome binary: {chrome_binary} (v{version_main})")
+    else:
+        logger.warning("Chrome binary not found — letting undetected_chromedriver auto-detect.")
+
     logger.info("Launching undetected Chrome (visible)...")
-    driver = uc.Chrome(options=options, use_subprocess=True)
+    driver = uc.Chrome(
+        options=options,
+        use_subprocess=True,
+        version_main=version_main,
+    )
 
     timeout = anti_bot.get("page_load_timeout", 60)
     driver.set_page_load_timeout(timeout)
