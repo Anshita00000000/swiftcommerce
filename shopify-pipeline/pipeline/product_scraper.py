@@ -35,6 +35,10 @@ def _scrape_one(driver, url: str, config: dict, anti_bot: dict) -> Optional[Dict
     driver.get(url)
     time.sleep(_random_delay(anti_bot))
 
+    # This scrolls down before doing anything else
+    if anti_bot.get("slow_scroll", False):
+        _slow_scroll_to_bottom(driver, scroll_pause=0.3)
+
     _run_pre_scrape_actions(driver, config.get("pre_scrape_actions", []))
 
     soup = BeautifulSoup(driver.page_source, "lxml")
@@ -329,3 +333,18 @@ def _random_delay(anti_bot: dict) -> float:
     if d_min is not None and d_max is not None:
         return random.uniform(float(d_min), float(d_max))
     return float(anti_bot.get("page_delay", 2))
+
+def _slow_scroll_to_bottom(driver, scroll_pause=0.5):
+    """Slow scroll to the bottom of the page to trigger lazy-loaded sections."""
+    last_height = driver.execute_script("return document.body.scrollHeight")
+    
+    # We don't need to scroll the ENTIRE page usually, 
+    # just enough to hit the footer where the specs are.
+    # Let's scroll in 400px steps.
+    for i in range(0, last_height, 400):
+        driver.execute_script(f"window.scrollTo(0, {i});")
+        time.sleep(scroll_pause)
+        
+    # One final scroll to the very bottom
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(1) # Final wait for JS to render

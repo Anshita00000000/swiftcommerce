@@ -22,9 +22,11 @@ CHROME_PATHS = [
     # macOS
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
-    # Windows (via shutil.which fallback below)
+    # Windows
+    r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    r"C:\Users\anshi\AppData\Local\Google\Chrome\Application\chrome.exe",
 ]
-
 
 def _get_chrome_major_version(binary: str) -> int:
     """Return the major version number of the Chrome binary (e.g. 145)."""
@@ -85,19 +87,23 @@ def build_driver(anti_bot: dict = None) -> uc.Chrome:
         options.add_argument(f"--user-agent={anti_bot['user_agent']}")
 
     chrome_binary = _find_chrome()
-    version_main = None
+    
+    # 1. Detect the binary location
     if chrome_binary:
         options.binary_location = chrome_binary
-        version_main = _get_chrome_major_version(chrome_binary) or None
-        logger.info(f"Using Chrome binary: {chrome_binary} (v{version_main})")
+        logger.info(f"Using Chrome binary: {chrome_binary}")
     else:
         logger.warning("Chrome binary not found — letting undetected_chromedriver auto-detect.")
 
-    logger.info("Launching undetected Chrome (visible)...")
+    # 2. FORCE the version here so it doesn't get overwritten or set to None
+    version_main = 144 
+    logger.info(f"Forcing ChromeDriver version: {version_main}")
+
+    # 3. Now pass this to the driver
     driver = uc.Chrome(
         options=options,
         use_subprocess=True,
-        version_main=version_main,
+        version_main=version_main, # This will now definitely be 144
     )
 
     timeout = anti_bot.get("page_load_timeout", 60)

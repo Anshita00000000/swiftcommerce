@@ -18,7 +18,7 @@ url_collection:
   pagination:
     type: scroll                     # Confirmed: infinite scroll in original scraper
 
-  product_link_selector: "a.product_link_in_list"   # Confirmed from scraper
+  product_link_selector: "#product-grid a[href*='/products/']"   # Confirmed from scraper
   link_attribute: href
 
 driver:
@@ -34,9 +34,10 @@ anti_bot:
   slow_scroll: true                  # Confirmed: original scraper scrolled to load all products
   scroll_pause: 3.0
 
-pre_scrape_actions: []               # No accordions to open — specs visible on load
+pre_scrape_actions: []
 
 selectors:
+
   title:
     # seikousa.com is Shopify — product title typically in .product__title
     # Confirmed SKU in: <span class="bls__sku-value">SRPL61</span>
@@ -87,6 +88,10 @@ image_download:
 
 spec_table:
   header: "Item Specification"
+  extraction_type: row
+  row_selector: ".feature-item, .techdata-grid > div" 
+  key_selector: ".feature-label, .label"
+  value_selector: ".feature-value, .value"
   rows:
     - label: "Brand"
       type: static
@@ -94,8 +99,35 @@ spec_table:
     - label: "Model"
       type: scraped
       field: sku
+    - label: "Movement"
+      type: spec
+      spec_key: "Movement"
+    - label: "Case Material"
+      type: spec
+      spec_key: "Case Material"
+    - label: "Diameter"
+      type: spec
+      spec_key: "Diameter"
+    - label: "Thickness"
+      type: spec
+      spec_key: "Thickness"
+    - label: "Water Resistance"
+      type: spec
+      spec_key: "Water Resistance"
+    - label: "Lug Width"
+      type: spec
+      spec_key: "Lug Width"
+    - label: "Strap"
+      type: spec
+      spec_key: "Strap"
+    - label: "Dial Color"
+      type: spec
+      spec_key: "Dial Color"
+    - label: "Crystal"
+      type: spec
+      spec_key: "Crystal Material"
     - label: "Features"
-      type: features_list            # Renders as <ul> from the li bullet list
+      type: features_list
       field: features
 
 shopify:
