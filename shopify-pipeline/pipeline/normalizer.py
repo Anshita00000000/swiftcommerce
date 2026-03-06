@@ -5,31 +5,12 @@ Builds the Body (HTML) from description + spec table + footer.
 """
 
 import logging
-import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from slugify import slugify
 
 logger = logging.getLogger(__name__)
-
-# Shopify CSV columns (in order)
-SHOPIFY_COLUMNS = [
-    "Handle",
-    "Title",
-    "Body (HTML)",
-    "Vendor",
-    "Type",
-    "Tags",
-    "Published",
-    "Option1 Name",
-    "Option1 Value",
-    "Variant SKU",
-    "Variant Price",
-    "Image Src",
-    "Image Position",
-    "Variant Metafield: custom.source_url",
-]
 
 
 def normalize_products(
@@ -38,20 +19,8 @@ def normalize_products(
     image_map: Dict[str, List[str]],
     brand: str,
 ) -> List[Dict[str, Any]]:
-    """
-    Convert raw scraped products to Shopify-formatted dicts.
-
-    Args:
-        raw_products: Output from product_scraper.
-        config: Parsed YAML config.
-        image_map: {source_url -> [local_image_paths]} (may be empty if images not downloaded).
-        brand: Brand name string.
-
-    Returns:
-        List of normalized product dicts ready for export.
-    """
     shopify_mapping = config.get("shopify_mapping", {})
-    footer_html = _load_footer(config)
+    footer_html = _load_footer()
     normalized = []
 
     for raw in raw_products:
@@ -64,38 +33,22 @@ def normalize_products(
     return normalized
 
 
-def _normalize_one(
-    raw: dict,
-    config: dict,
-    shopify_mapping: dict,
-    image_map: Dict[str, List[str]],
-    footer_html: str,
-    brand: str,
-) -> dict:
-    """Normalize a single product."""
+def _normalize_one(raw, config, shopify_mapping, image_map, footer_html, brand):
     source_url = raw.get("source_url", "")
 
-    # --- Handle / slug ---
     title_raw = _get_mapped(raw, shopify_mapping, "title", "title")
     handle = slugify(title_raw) if title_raw else slugify(source_url.split("/")[-1])
 
-    # --- Vendor, Type, Tags ---
     vendor = shopify_mapping.get("vendor", {}).get("value", config.get("brand_name", brand))
     product_type = _resolve_mapping(raw, shopify_mapping.get("type", {}))
-    tags_cfg = shopify_mapping.get("tags", {})
-    tags = _resolve_tags(raw, tags_cfg)
-
-    # --- Price / SKU ---
-    price = _get_mapped(raw, shopify_mapping, "price", "price")
-    price = _clean_price(price)
+    tags = _resolve_tags(raw, shopify_mapping.get("tags", {}))
+    price = _clean_price(_get_mapped(raw, shopify_mapping, "price", "price"))
     sku = _get_mapped(raw, shopify_mapping, "sku", "sku")
 
-    # --- Body HTML ---
     description = _get_mapped(raw, shopify_mapping, "description", "description")
     spec_html = _build_spec_table(raw, config)
     body_html = _build_body_html(description, spec_html, footer_html)
 
-    # --- Images ---
     image_paths = image_map.get(source_url, raw.get("images", []))
 
     return {
@@ -121,24 +74,22 @@ def _normalize_one(
 
 def _build_spec_table(raw: dict, config: dict) -> str:
     """
-    Build a styled HTML table from spec_table.rows in YAML config.
+    Build a styled HTML table from spec_table.rows in config.
 
     Row types:
-      - static:        constant value from config
-      - scraped:       value from a scraped field
-      - label_value:   from raw["specs"] key/value pairs
-      - aria_label:    same as label_value (from aria-label attrs)
-      - features_list: renders as <ul>
+      static       — constant value from config
+      scraped      — value from a scraped field
+      label_value  — from raw["specs"] by spec_key
+      aria_label   — from raw["specs"] by aria_key
+      features_list — renders as <ul>
     """
-    spec_table_cfg = config.get("spec_table", {})
-    rows_cfg = spec_table_cfg.get("rows", [])
-
+    rows_cfg = config.get("spec_table", {}).get("rows", [])
     if not rows_cfg:
         return ""
 
-    rows_html = []
     specs = raw.get("specs", {})
     features = raw.get("features", [])
+    rows_html = []
 
     for row in rows_cfg:
         row_type = row.get("type", "static")
@@ -156,19 +107,29 @@ def _build_spec_table(raw: dict, config: dict) -> str:
                 if label and value:
                     rows_html.append(_table_row(label, value))
 
-            elif row_type in ("label_value", "aria_label"):
-                # Pull from specs dict — row config defines which keys to include
-                keys = row.get("keys", list(specs.keys()))
-                for key in keys:
-                    val = specs.get(key, "")
-                    if key and val:
-                        rows_html.append(_table_row(key, val))
+            elif row_type == "label_value":
+                # Hamilton: look up by spec_key in raw["specs"]
+                spec_key = row.get("spec_key", label)
+                value = specs.get(spec_key, "")
+                if not value:
+                    # Try case-insensitive match
+                    value = _lookup_spec_ci(specs, spec_key)
+                if label and value:
+                    rows_html.append(_table_row(label, value))
+
+            elif row_type == "aria_label":
+                # Tissot: look up by aria_key in raw["specs"]
+                aria_key = row.get("aria_key", label)
+                value = specs.get(aria_key, "")
+                if not value:
+                    value = _lookup_spec_ci(specs, aria_key)
+                if label and value:
+                    rows_html.append(_table_row(label, value))
 
             elif row_type == "features_list":
                 if features:
-                    items_html = "".join(f"<li>{f}</li>" for f in features)
-                    value_html = f"<ul>{items_html}</ul>"
-                    rows_html.append(_table_row(label, value_html, raw_value=True))
+                    items_html = "".join(f"<li>{_escape_html(f)}</li>" for f in features)
+                    rows_html.append(_table_row(label, f"<ul>{items_html}</ul>", raw_value=True))
 
         except Exception as e:
             logger.warning(f"  [spec_table] Row '{label}' failed: {e}")
@@ -176,16 +137,17 @@ def _build_spec_table(raw: dict, config: dict) -> str:
     if not rows_html:
         return ""
 
-    style = (
-        'style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:14px;"'
-    )
-    table = (
-        f'<table {style}>'
-        "<tbody>"
-        + "".join(rows_html)
-        + "</tbody></table>"
-    )
-    return table
+    style = 'style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:14px;"'
+    return f'<table {style}><tbody>{"".join(rows_html)}</tbody></table>'
+
+
+def _lookup_spec_ci(specs: dict, key: str) -> str:
+    """Case-insensitive lookup in specs dict."""
+    key_lower = key.lower()
+    for k, v in specs.items():
+        if k.lower() == key_lower:
+            return v
+    return ""
 
 
 def _table_row(label: str, value: str, raw_value: bool = False) -> str:
@@ -206,7 +168,7 @@ def _escape_html(text: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Body HTML builder
+# Body HTML
 # ---------------------------------------------------------------------------
 
 def _build_body_html(description: str, spec_html: str, footer_html: str) -> str:
@@ -220,8 +182,7 @@ def _build_body_html(description: str, spec_html: str, footer_html: str) -> str:
     return "\n".join(parts)
 
 
-def _load_footer(config: dict) -> str:
-    """Load footer HTML from config/footer.html if it exists."""
+def _load_footer() -> str:
     footer_path = Path("config") / "footer.html"
     if footer_path.exists():
         try:
@@ -236,7 +197,6 @@ def _load_footer(config: dict) -> str:
 # ---------------------------------------------------------------------------
 
 def _get_mapped(raw: dict, mapping: dict, mapping_key: str, raw_key: str) -> str:
-    """Resolve a shopify_mapping field, fallback to raw field."""
     cfg = mapping.get(mapping_key, {})
     if isinstance(cfg, dict):
         return _resolve_mapping(raw, cfg) or raw.get(raw_key, "")
@@ -244,10 +204,6 @@ def _get_mapped(raw: dict, mapping: dict, mapping_key: str, raw_key: str) -> str
 
 
 def _resolve_mapping(raw: dict, cfg: dict) -> str:
-    """
-    Resolve a mapping config dict.
-    Supports: {source: "field_name"} or {value: "constant"}.
-    """
     if not cfg:
         return ""
     if "value" in cfg:
@@ -257,8 +213,7 @@ def _resolve_mapping(raw: dict, cfg: dict) -> str:
     return ""
 
 
-def _resolve_tags(raw: dict, tags_cfg: dict) -> str:
-    """Build a comma-separated tags string from config."""
+def _resolve_tags(raw: dict, tags_cfg) -> str:
     if isinstance(tags_cfg, dict):
         static = tags_cfg.get("static", [])
         source_field = tags_cfg.get("source")
@@ -272,11 +227,9 @@ def _resolve_tags(raw: dict, tags_cfg: dict) -> str:
 
 
 def _clean_price(price: str) -> str:
-    """Strip currency symbols and whitespace, keep digits and decimal."""
     if not price:
         return ""
     cleaned = "".join(c for c in price if c.isdigit() or c in ".,")
-    # Handle European comma-decimal format
     if cleaned.count(",") == 1 and cleaned.count(".") == 0:
         cleaned = cleaned.replace(",", ".")
     elif cleaned.count(",") >= 1:

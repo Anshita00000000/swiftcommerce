@@ -1,14 +1,15 @@
 """
 product_scraper.py
-Visits each product URL and extracts structured data per the brand YAML config.
+Visits each product URL and extracts structured data per the adapted brand config.
 Per-field try/except isolation: one bad field never crashes a product.
 """
 
-import json
 import logging
+import random
 import re
 import time
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
@@ -17,206 +18,314 @@ logger = logging.getLogger(__name__)
 
 
 def scrape_products(driver, urls: List[str], config: dict) -> List[Dict[str, Any]]:
-    """
-    Scrape each URL and return a list of raw product dicts.
-
-    Args:
-        driver: Selenium WebDriver instance.
-        urls: Product page URLs to scrape.
-        config: Parsed YAML config dict.
-
-    Returns:
-        List of raw product data dicts (pre-normalization).
-    """
-    delay = config.get("anti_bot", {}).get("page_delay", 2)
+    anti_bot = config.get("anti_bot", {})
     products = []
-
     for i, url in enumerate(urls, 1):
         logger.info(f"Scraping product {i}/{len(urls)}: {url}")
         try:
-            product = _scrape_one(driver, url, config, delay)
+            product = _scrape_one(driver, url, config, anti_bot)
             if product:
                 products.append(product)
         except Exception as e:
             logger.error(f"  Fatal error scraping {url}: {e}")
-
     return products
 
 
-def _scrape_one(driver, url: str, config: dict, delay: float) -> Optional[Dict[str, Any]]:
-    """Scrape a single product page."""
+def _scrape_one(driver, url: str, config: dict, anti_bot: dict) -> Optional[Dict[str, Any]]:
     driver.get(url)
-    time.sleep(delay)
+    time.sleep(_random_delay(anti_bot))
+
+    _run_pre_scrape_actions(driver, config.get("pre_scrape_actions", []))
 
     soup = BeautifulSoup(driver.page_source, "lxml")
-    selectors = config.get("selectors", {})
-    fields = config.get("fields", {})
+    fields_selectors = config.get("fields_selectors", {})
     image_config = config.get("images", {})
-    spec_config = config.get("spec_table", {})
+    spec_extraction = config.get("spec_extraction", {})
+    spec_table_cfg = config.get("spec_table", {})
 
     product = {"source_url": url}
 
-    # --- Core fields (each isolated) ---
-    for field_name, selector in fields.items():
-        if not selector:
+    # Core fields — try each fallback selector
+    for field_name, selectors in fields_selectors.items():
+        if field_name == "features":
             continue
         try:
-            product[field_name] = _extract_text(soup, selector)
+            product[field_name] = _extract_text_from_list(soup, selectors)
         except Exception as e:
             logger.warning(f"  [{field_name}] extraction failed: {e}")
             product[field_name] = ""
 
-    # --- Images ---
+    # Features list
     try:
-        product["images"] = _extract_images(driver, soup, image_config, url)
-    except Exception as e:
-        logger.warning(f"  [images] extraction failed: {e}")
-        product["images"] = []
-
-    # --- Spec table key/value pairs ---
-    try:
-        product["specs"] = _extract_specs(soup, spec_config)
-    except Exception as e:
-        logger.warning(f"  [specs] extraction failed: {e}")
-        product["specs"] = {}
-
-    # --- Features list ---
-    try:
-        features_selector = selectors.get("features_list")
-        if features_selector:
-            product["features"] = _extract_list(soup, features_selector)
-        else:
-            product["features"] = []
+        product["features"] = _extract_list_from_selectors(
+            soup, fields_selectors.get("features", [])
+        )
     except Exception as e:
         logger.warning(f"  [features] extraction failed: {e}")
         product["features"] = []
 
-    logger.debug(f"  Scraped: {product.get('title', url)}")
+    # Images
+    try:
+        product["images"] = _extract_images(soup, image_config, url)
+    except Exception as e:
+        logger.warning(f"  [images] extraction failed: {e}")
+        product["images"] = []
+
+    # Spec key/value pairs
+    try:
+        product["specs"] = _extract_specs(soup, spec_extraction, spec_table_cfg)
+    except Exception as e:
+        logger.warning(f"  [specs] extraction failed: {e}")
+        product["specs"] = {}
+
+    logger.debug(
+        f"  Scraped: {product.get('title', url)} | "
+        f"images={len(product['images'])} | specs={len(product['specs'])}"
+    )
     return product
 
 
 # ---------------------------------------------------------------------------
-# Extraction helpers
+# Pre-scrape actions
 # ---------------------------------------------------------------------------
 
-def _extract_text(soup: BeautifulSoup, selector: str) -> str:
-    """Extract and clean text from the first matching CSS selector."""
-    el = soup.select_one(selector)
-    if el is None:
-        return ""
-    return el.get_text(separator=" ", strip=True)
+def _run_pre_scrape_actions(driver, actions: list) -> None:
+    for action in actions:
+        action_type = action.get("type", "")
+        selector = action.get("selector", "")
+        if not selector:
+            continue
+        try:
+            if action_type == "js_click_all":
+                elements = driver.find_elements(By.CSS_SELECTOR, selector)
+                for el in elements:
+                    try:
+                        driver.execute_script("arguments[0].click();", el)
+                    except Exception:
+                        pass
+                if elements:
+                    time.sleep(0.8)
+                    logger.debug(f"  [pre_scrape] js_click_all '{selector}' -> {len(elements)} clicks")
+            elif action_type == "click":
+                el = driver.find_element(By.CSS_SELECTOR, selector)
+                el.click()
+                time.sleep(0.5)
+        except Exception as e:
+            logger.debug(f"  [pre_scrape] '{action_type}' on '{selector}' failed: {e}")
 
 
-def _extract_list(soup: BeautifulSoup, selector: str) -> List[str]:
-    """Extract text from all matching elements as a list."""
-    els = soup.select(selector)
-    return [el.get_text(strip=True) for el in els if el.get_text(strip=True)]
+# ---------------------------------------------------------------------------
+# Field extraction
+# ---------------------------------------------------------------------------
+
+def _extract_text_from_list(soup: BeautifulSoup, selectors: List[str]) -> str:
+    for sel in selectors:
+        if not sel:
+            continue
+        try:
+            # Handle attribute selectors like [data-pid]
+            attr_match = re.match(r'^\[([a-zA-Z0-9_-]+)\]$', sel.strip())
+            if attr_match:
+                el = soup.select_one(sel)
+                if el:
+                    val = el.get(attr_match.group(1), "")
+                    if val:
+                        return val.strip()
+            else:
+                el = soup.select_one(sel)
+                if el:
+                    text = el.get_text(separator=" ", strip=True)
+                    if text:
+                        return text
+        except Exception:
+            pass
+    return ""
 
 
-def _extract_images(driver, soup: BeautifulSoup, image_config: dict, page_url: str) -> List[str]:
-    """
-    Extract product images. Supports two methods:
-      - magento_json: parse a JSON blob embedded in a <script> tag
-      - dom_selector: CSS selector(s) pointing to <img> or elements with data-src/src
-    Normalizes all URLs to https:// and deduplicates.
-    """
-    method = image_config.get("method", "dom_selector")
+def _extract_list_from_selectors(soup: BeautifulSoup, selectors: List[str]) -> List[str]:
+    for sel in selectors:
+        if not sel:
+            continue
+        try:
+            els = soup.select(sel)
+            items = [el.get_text(strip=True) for el in els if el.get_text(strip=True)]
+            if items:
+                return items
+        except Exception:
+            pass
+    return []
 
-    if method == "magento_json":
-        return _images_magento_json(soup, image_config)
+
+# ---------------------------------------------------------------------------
+# Spec extraction
+# ---------------------------------------------------------------------------
+
+def _extract_specs(soup: BeautifulSoup, spec_extraction: dict, spec_table_cfg: dict) -> Dict[str, str]:
+    ext_type = spec_extraction.get("type", "row")
+    if ext_type == "label_value":
+        return _specs_label_value(soup, spec_extraction)
+    elif ext_type == "aria_label":
+        return _specs_aria_label(soup, spec_extraction, spec_table_cfg)
     else:
-        return _images_dom_selector(soup, image_config)
+        return _specs_row(soup, spec_extraction)
+
+
+def _specs_row(soup: BeautifulSoup, spec_extraction: dict) -> Dict[str, str]:
+    row_sel = spec_extraction.get("row_selector", "")
+    key_sel = spec_extraction.get("key_selector", "")
+    val_sel = spec_extraction.get("value_selector", "")
+    specs = {}
+    if not (row_sel and key_sel and val_sel):
+        return specs
+    for row in soup.select(row_sel):
+        try:
+            key_el = row.select_one(key_sel)
+            val_el = row.select_one(val_sel)
+            if key_el and val_el:
+                key = key_el.get_text(strip=True)
+                val = val_el.get_text(strip=True)
+                if key:
+                    specs[key] = val
+        except Exception:
+            pass
+    return specs
+
+
+def _specs_label_value(soup: BeautifulSoup, spec_extraction: dict) -> Dict[str, str]:
+    """Hamilton: parallel .attribute-label / .attribute-value elements (zipped)."""
+    label_sel = spec_extraction.get("label_selector", ".attribute-label")
+    value_sel = spec_extraction.get("value_selector", ".attribute-value")
+    specs = {}
+    labels = soup.select(label_sel)
+    values = soup.select(value_sel)
+    for label_el, value_el in zip(labels, values):
+        try:
+            key = label_el.get_text(strip=True).rstrip(":")
+            val = value_el.get_text(strip=True)
+            if key:
+                specs[key] = val
+        except Exception:
+            pass
+    return specs
+
+
+def _specs_aria_label(soup: BeautifulSoup, spec_extraction: dict, spec_table_cfg: dict) -> Dict[str, str]:
+    """Tissot: aria-label='KEY VALUE' — parse by known keys from spec_table rows."""
+    row_sel = spec_extraction.get("row_selector", "")
+    label_attr = spec_extraction.get("label_attr", "aria-label")
+    specs = {}
+    if not row_sel:
+        return specs
+
+    # Build list of known keys from spec_table rows
+    known_keys = [
+        row["aria_key"]
+        for row in spec_table_cfg.get("rows", [])
+        if row.get("type") == "aria_label" and row.get("aria_key")
+    ]
+
+    for el in soup.select(row_sel):
+        aria_val = el.get(label_attr, "").strip()
+        if not aria_val:
+            continue
+        matched = False
+        for key in known_keys:
+            if aria_val.lower().startswith(key.lower()):
+                value = aria_val[len(key):].strip()
+                specs[key] = value
+                matched = True
+                break
+        if not matched:
+            # Store full string keyed by itself (will be skipped in spec table)
+            specs[aria_val] = aria_val
+    return specs
+
+
+# ---------------------------------------------------------------------------
+# Image extraction
+# ---------------------------------------------------------------------------
+
+def _extract_images(soup: BeautifulSoup, image_config: dict, page_url: str) -> List[str]:
+    method = image_config.get("method", "dom_selector")
+    exclude_keywords = image_config.get("exclude_keywords", [])
+    urls = []
+
+    if method in ("magento_json", "both"):
+        urls.extend(_images_magento_json(soup, image_config))
+
+    if method in ("dom_selector", "both") and not urls:
+        urls.extend(_images_dom_selector(soup, image_config, page_url))
+
+    if exclude_keywords:
+        urls = [u for u in urls if not any(kw.lower() in u.lower() for kw in exclude_keywords)]
+
+    return _normalize_and_dedup_images(urls, image_config.get("strip_query_params", False))
 
 
 def _images_magento_json(soup: BeautifulSoup, image_config: dict) -> List[str]:
-    """Extract images from Magento-style JSON embedded in a script tag."""
-    script_pattern = image_config.get("script_pattern", r"\"url\":\"(https?://[^\"]+)\"")
-    scripts = soup.find_all("script", type=lambda t: t != "application/ld+json")
+    script_pattern = image_config.get("script_pattern", r'"url":"(https?://[^"]+)"')
+    script_contains = image_config.get("script_contains", "")
     urls = []
-
-    for script in scripts:
+    for script in soup.find_all("script"):
         text = script.string or ""
-        # Look for the gallery data object or any JSON with image urls
-        if image_config.get("script_contains") and image_config["script_contains"] not in text:
+        if script_contains and script_contains not in text:
             continue
         try:
-            found = re.findall(script_pattern, text)
-            urls.extend(found)
+            urls.extend(re.findall(script_pattern, text))
         except Exception:
             pass
+    return urls
 
-    return _normalize_and_dedup_images(urls)
 
+def _images_dom_selector(soup: BeautifulSoup, image_config: dict, page_url: str) -> List[str]:
+    selectors = image_config.get("selectors", [])
+    if not selectors and image_config.get("selector"):
+        selectors = [image_config["selector"]]
 
-def _images_dom_selector(soup: BeautifulSoup, image_config: dict) -> List[str]:
-    """Extract image URLs from DOM elements using CSS selectors."""
-    selector = image_config.get("selector", "")
     attr = image_config.get("attr", "src")
     fallback_attr = image_config.get("fallback_attr", "data-src")
-
-    if not selector:
-        return []
+    parsed = urlparse(page_url)
+    base = f"{parsed.scheme}://{parsed.netloc}"
 
     urls = []
-    for el in soup.select(selector):
-        url = el.get(attr) or el.get(fallback_attr) or ""
-        if url and not url.startswith("data:"):
-            urls.append(url)
+    for selector in selectors:
+        if not selector:
+            continue
+        for el in soup.select(selector):
+            url = el.get(attr) or el.get(fallback_attr) or ""
+            if not url:
+                img = el.find("img")
+                if img:
+                    url = img.get(attr) or img.get(fallback_attr) or ""
+            if url and not url.startswith("data:"):
+                if url.startswith("//"):
+                    url = "https:" + url
+                elif url.startswith("/"):
+                    url = base + url
+                urls.append(url)
+    return urls
 
-    return _normalize_and_dedup_images(urls)
 
-
-def _normalize_and_dedup_images(urls: List[str]) -> List[str]:
-    """Normalize all image URLs to https:// and remove duplicates."""
+def _normalize_and_dedup_images(urls: List[str], strip_query: bool = False) -> List[str]:
     seen = set()
     result = []
     for url in urls:
         url = url.strip()
-        # Normalize protocol-relative URLs
         if url.startswith("//"):
             url = "https:" + url
         elif url.startswith("http://"):
             url = "https://" + url[7:]
+        if strip_query and "?" in url:
+            url = url.split("?")[0]
         if url and url not in seen:
             seen.add(url)
             result.append(url)
     return result
 
 
-def _extract_specs(soup: BeautifulSoup, spec_config: dict) -> Dict[str, str]:
-    """
-    Extract key/value spec pairs from a spec table.
-    Supports row_selector + key_selector + value_selector pattern,
-    and aria-label attribute extraction.
-    """
-    specs = {}
-
-    row_selector = spec_config.get("row_selector")
-    key_selector = spec_config.get("key_selector")
-    value_selector = spec_config.get("value_selector")
-    aria_selector = spec_config.get("aria_label_selector")
-
-    if row_selector and key_selector and value_selector:
-        for row in soup.select(row_selector):
-            try:
-                key_el = row.select_one(key_selector)
-                val_el = row.select_one(value_selector)
-                if key_el and val_el:
-                    key = key_el.get_text(strip=True)
-                    val = val_el.get_text(strip=True)
-                    if key:
-                        specs[key] = val
-            except Exception:
-                pass
-
-    if aria_selector:
-        for el in soup.select(aria_selector):
-            try:
-                label = el.get("aria-label", "").strip()
-                text = el.get_text(strip=True)
-                if label:
-                    specs[label] = text
-            except Exception:
-                pass
-
-    return specs
+def _random_delay(anti_bot: dict) -> float:
+    d_min = anti_bot.get("random_delay_min")
+    d_max = anti_bot.get("random_delay_max")
+    if d_min is not None and d_max is not None:
+        return random.uniform(float(d_min), float(d_max))
+    return float(anti_bot.get("page_delay", 2))
