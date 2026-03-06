@@ -1,0 +1,135 @@
+# ============================================================
+# TISSOT — BRAND CONFIG
+# Verified against: https://www.tissotwatches.com/en-us/T1274071109101.html
+# Platform: Salesforce Commerce Cloud (SFCC)
+# ============================================================
+
+brand: tissot
+display_name: "Tissot"
+base_url: https://www.tissotwatches.com
+
+url_collection:
+  type: category_scrape
+  category_urls:
+    - https://www.tissotwatches.com/en-us/collection.html
+    
+
+  pagination:
+    type: url_param
+    param: "?page={}"
+    max_pages: 20                    # Confirmed: scraper used pages 1-12
+
+  product_link_selector: "a.product-tile"
+  link_attribute: href
+
+driver:
+  type: undetected
+  use_webdriver_manager: true
+  start_maximized: true
+  first_load_wait: 15
+  page_load_wait: 5
+
+anti_bot:
+  random_delay_min: 3
+  random_delay_max: 7
+  slow_scroll: false
+
+pre_scrape_actions:
+  # Tissot specs are in Bootstrap collapse accordions
+  # Trigger all collapses to open via JS before scraping
+  - type: js_click_all
+    selector: ".ti-pdp-collapsible-link.collapsed"
+
+selectors:
+  title:
+    - "h1.product-name"             # Confirmed: <h1 class="product-name ti-fs-20...">
+
+  price:
+    - ".ti-price-sales"             # Confirmed: <span class="ti-price-sales">
+    - ".ti-product-price-inner"
+
+  sku:
+    - ".product-reference"          # Confirmed: <p class="product-reference">T127.407.11.091.01</p>
+    - "[data-pid]"                  # data-pid="T1274071109101" on product wrapper
+
+  description:
+    - "#collapseOne p.ti-pdp-details-content"   # Description accordion content
+
+  features: []                      # Tissot has no separate features list — specs are key/value pairs
+
+  color: []                         # No color swatch on Tissot PDP
+
+  # Tissot-specific: key-value spec rows
+  # Each row: <div aria-label="KEY VALUE"> with .ti-pdp-attribute children
+  specs_container: ".ti-pdp-details-content"
+  specs_row_selector: ".ti-pdp-details-content[aria-label]"
+  specs_label_attr: "aria-label"    # aria-label="Case Material 316L stainless steel case"
+
+image_extraction:
+  # Tissot: images in swiper slides, full res on img.ti-pdp-image inside modal
+  # Best source: modal swiper has clean URLs without size params
+  method: dom
+  dom_selectors:
+    - ".ti-pdp-images-gallery-swiper img.ti-pdp-image"
+    - ".swiper-slide img.ti-pdp-image"
+  dom_attribute: src                # src has ?sm=fit&sw=800 — strip params for full res
+  url_cleanup:
+    strip_query_params: true        # Remove ?sm=fit&sw=800... to get full resolution
+  magento_json: false
+  exclude_keywords:
+    - thumbnail
+    - thumb
+    - 150
+    - shadow                        # Skip shadow images (duplicates of front view)
+
+image_download:
+  use_session_cookies: false
+  referer: "https://www.tissotwatches.com/"
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+
+spec_table:
+  header: "Item Specification"
+  # Tissot specs are extracted from aria-label attributes on .ti-pdp-details-content rows
+  # Format: aria-label="Label Value" e.g. "Case Material 316L stainless steel case"
+  extraction_type: aria_label_pairs  # Special type: parse key/value from aria-label
+  rows:
+    - label: "Brand"
+      type: static
+      value: "Tissot"
+    - label: "SKU"
+      type: scraped
+      field: sku
+    - label: "Case Material"
+      type: aria_label
+      aria_key: "Case Material"
+    - label: "Crystal"
+      type: aria_label
+      aria_key: "Crystal"
+    - label: "Water Resistance"
+      type: aria_label
+      aria_key: "Water resistance"
+    - label: "Movement"
+      type: aria_label
+      aria_key: "Movement"
+    - label: "Case Size"
+      type: aria_label
+      aria_key: "Width"
+    - label: "Lug Width"
+      type: aria_label
+      aria_key: "Lugs"
+    - label: "Strap Material"
+      type: aria_label
+      aria_key: "Strap material"
+    - label: "Description"
+      type: scraped
+      field: description
+
+shopify:
+  vendor: "Tissot"
+  product_type: "Watch"
+  status_on_import: draft
+  default_tags:
+    - tissot
+    - swiss-watch
+    - luxury
+  source_url_metafield: "custom.source_url"

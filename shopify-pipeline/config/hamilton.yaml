@@ -1,0 +1,148 @@
+# ============================================================
+# HAMILTON — BRAND CONFIG
+# Verified against: https://www.hamiltonwatch.com/en-us/h71636330-khaki-field-day-date-auto-chrono-resident-evil-requiem-limited-edition.html
+# Platform: Magento (custom Hamilton theme)
+# ============================================================
+
+brand: hamilton
+display_name: "Hamilton"
+base_url: https://www.hamiltonwatch.com
+
+url_collection:
+  type: category_scrape
+  category_urls:
+    - https://www.hamiltonwatch.com/en-us/collection.html
+    - https://www.hamiltonwatch.com/en-us/collection/khaki-field.html
+    - https://www.hamiltonwatch.com/en-us/collection/khaki-aviation.html
+    - https://www.hamiltonwatch.com/en-us/collection/khaki-navy.html
+    - https://www.hamiltonwatch.com/en-us/collection/american-classic.html
+    - https://www.hamiltonwatch.com/en-us/collection/jazz-master.html
+    # Add more collections as needed
+
+  pagination:
+    type: scroll                     # Hamilton uses infinite scroll
+
+  product_link_selector: "a.product-item-link"
+  link_attribute: href
+
+driver:
+  type: undetected
+  use_webdriver_manager: true
+  start_maximized: true
+  first_load_wait: 20
+  page_load_wait: 8
+
+anti_bot:
+  random_delay_min: 5
+  random_delay_max: 10
+  slow_scroll: false
+
+pre_scrape_actions:
+  # Hamilton specs are in accordion tabs — click to expand all
+  - type: js_click_all
+    selector: ".accordion-title-text[data-role='trigger']"
+
+selectors:
+  title:
+    # Confirmed: <h1 class="page-title large">
+    #   <span class="pretitle">Khaki Field</span>
+    #   <span class="base">Auto Chrono Resident Evil...</span>
+    - "h1.page-title.large .base"
+    - "h1.page-title .base"
+
+  price:
+    - ".price-box .price"            # Confirmed: <span class="price">$2,175.00</span>
+    - ".price-wrapper .price"
+
+  sku:
+    # Confirmed: data-product-sku="H71636330" on the form
+    # Also in specs: <span class="attribute-label">Reference</span> <span class="attribute-value">H71636330</span>
+    - ".product-main-attributes .attribute-value"
+    - "[data-product-sku]"           # attribute value on the form element
+
+  description:
+    - ".product.attribute.description .value"   # Confirmed in HTML
+
+  features: []                       # Hamilton has no bullet features — uses accordion specs
+
+  color: []                          # No color swatches
+
+  # Hamilton-specific: accordion spec list
+  # Confirmed structure: <span class="attribute-label">X</span> <span class="attribute-value">Y</span>
+  specs_container: "#additional"     # Specifications accordion panel
+  specs_label_selector: ".attribute-label"
+  specs_value_selector: ".attribute-value"
+
+image_extraction:
+  # Hamilton uses Fotorama gallery with lazy-loaded images
+  # Confirmed: .gallery-img-button img with data-src (lazy loaded) and src (loaded)
+  method: dom
+  dom_selectors:
+    - ".gallery-img-button img"      # Thumbnail strip — use data-src for full cached URL
+    - ".fotorama__stage__frame img"  # Main stage image
+  dom_attribute: data-src            # lazy-loaded, data-src has the real URL
+  magento_json: false
+  exclude_keywords:
+    - placeholder
+    - svg
+    - caliber                        # Skip caliber movement images
+
+image_download:
+  use_session_cookies: false
+  referer: "https://www.hamiltonwatch.com/"
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+
+spec_table:
+  header: "Item Specification"
+  # Hamilton specs: attribute-label / attribute-value pairs in <li> elements
+  extraction_type: label_value_pairs
+  rows:
+    - label: "Brand"
+      type: static
+      value: "Hamilton"
+    - label: "Reference"
+      type: label_value
+      spec_key: "Reference"
+    - label: "Caliber"
+      type: label_value
+      spec_key: "Caliber"
+    - label: "Movement"
+      type: label_value
+      spec_key: "Movement"
+    - label: "Case Size"
+      type: label_value
+      spec_key: "Case size"
+    - label: "Case Material"
+      type: label_value
+      spec_key: "Case material"
+    - label: "Dial Color"
+      type: label_value
+      spec_key: "Dial color"
+    - label: "Crystal"
+      type: label_value
+      spec_key: "Crystal"
+    - label: "Lug Width"
+      type: label_value
+      spec_key: "Lug width"
+    - label: "Water Resistance"
+      type: label_value
+      spec_key: "Water Resistance"
+    - label: "Power Reserve"
+      type: label_value
+      spec_key: "Power reserve"
+    - label: "Strap Type"
+      type: label_value
+      spec_key: "Strap type"
+    - label: "Description"
+      type: scraped
+      field: description
+
+shopify:
+  vendor: "Hamilton"
+  product_type: "Watch"
+  status_on_import: draft
+  default_tags:
+    - hamilton
+    - swiss-watch
+    - luxury
+  source_url_metafield: "custom.source_url"

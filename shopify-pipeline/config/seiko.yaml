@@ -1,0 +1,109 @@
+# ============================================================
+# SEIKO USA — BRAND CONFIG
+# Verified against: https://seikousa.com/collections/all/products/srpl61
+# Platform: Shopify (custom BLS theme)
+# NOTE: This is seikousa.com — different from seikowatches.com
+# ============================================================
+
+brand: seiko
+display_name: "Seiko"
+base_url: https://seikousa.com
+
+url_collection:
+  type: category_scrape
+  category_urls:
+    - https://seikousa.com/collections/mens
+    - https://seikousa.com/collections/womens
+
+  pagination:
+    type: scroll                     # Confirmed: infinite scroll in original scraper
+
+  product_link_selector: "a.product_link_in_list"   # Confirmed from scraper
+  link_attribute: href
+
+driver:
+  type: undetected
+  use_webdriver_manager: true
+  start_maximized: true
+  first_load_wait: 15
+  page_load_wait: 5
+
+anti_bot:
+  random_delay_min: 3
+  random_delay_max: 6
+  slow_scroll: true                  # Confirmed: original scraper scrolled to load all products
+  scroll_pause: 3.0
+
+pre_scrape_actions: []               # No accordions to open — specs visible on load
+
+selectors:
+  title:
+    # seikousa.com is Shopify — product title typically in .product__title
+    # Confirmed SKU in: <span class="bls__sku-value">SRPL61</span>
+    # Title appears to use product JSON data - using Shopify standard selector
+    - ".product__title"
+    - "h1.product-title"
+    - "h1.title"
+
+  price:
+    - "span.price"                   # Confirmed: <span class="price">$550.00</span>
+    - ".bls__product-price .price"
+
+  sku:
+    - ".bls__sku-value"              # Confirmed: <span class="bls__sku-value">SRPL61</span>
+    - ".bls__product-sku span"
+
+  description:
+    - ".product__description"
+    - ".product-description"
+
+  features:
+    # Confirmed: bullet list <li> items with watch features
+    - ".product__description li"
+    - ".product-description li"
+
+  color: []
+
+image_extraction:
+  # Seiko USA (Shopify): images in BLS product media, data-src on wrapper divs
+  # Confirmed: data-src="//seikousa.com/cdn/shop/files/SRPL61_1.png?v=..."
+  method: dom
+  dom_selectors:
+    - ".bls__prod-media[data-src]"   # Confirmed: wrapper div has data-src with full URL
+    - ".product-single__media-wrapper[data-src]"
+  dom_attribute: data-src            # Full URL on the wrapper div
+  magento_json: false
+  exclude_keywords:
+    - width=165
+    - width=360
+    - mobile                         # Skip mobile-specific duplicates
+  url_cleanup:
+    strip_query_params: false        # Keep ?v= version param for cache busting
+
+image_download:
+  use_session_cookies: false
+  referer: "https://seikousa.com/"
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+
+spec_table:
+  header: "Item Specification"
+  rows:
+    - label: "Brand"
+      type: static
+      value: "Seiko"
+    - label: "Model"
+      type: scraped
+      field: sku
+    - label: "Features"
+      type: features_list            # Renders as <ul> from the li bullet list
+      field: features
+
+shopify:
+  vendor: "Seiko"
+  product_type: "Watch"
+  status_on_import: draft
+  default_tags:
+    - seiko
+    - japanese-watch
+    - watches
+  source_url_metafield: "custom.source_url"
