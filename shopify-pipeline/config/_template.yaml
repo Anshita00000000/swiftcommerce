@@ -1,0 +1,159 @@
+# =============================================================================
+# _template.yaml — Universal Shopify Scraping Pipeline Config Template
+# Copy this file to config/{brand}.yaml and fill in the values.
+# Zero Python changes needed when adding a new brand — only this YAML.
+# =============================================================================
+
+# Brand display name (used as Shopify Vendor field)
+brand_name: "Brand Name"
+
+# Base URL of the brand website (used to resolve relative URLs)
+base_url: "https://www.example.com"
+
+# =============================================================================
+# Category pages to collect product URLs from
+# =============================================================================
+category_urls:
+  - "https://www.example.com/collections/watches"
+  - "https://www.example.com/collections/accessories"
+
+# =============================================================================
+# Pagination configuration
+# =============================================================================
+pagination:
+  # Type options: next_button | load_more | infinite_scroll | none
+  type: next_button
+
+  # For next_button:
+  next_button_selector: "a.next-page"
+  max_pages: 100
+
+  # For load_more:
+  # load_more_selector: "button.load-more"
+  # max_clicks: 50
+
+  # For infinite_scroll:
+  # max_scrolls: 50
+  # scroll_pause: 2  # seconds to wait after each scroll
+
+# =============================================================================
+# CSS selectors
+# =============================================================================
+selectors:
+  # Selector for product links on category pages
+  product_link: "a.product-item__title"
+
+  # Optional: features list items (for features_list spec row type)
+  features_list: "ul.product-features li"
+
+# =============================================================================
+# Per-page field selectors (text extraction)
+# Each key becomes a field in the raw product dict.
+# =============================================================================
+fields:
+  title: "h1.product__title"
+  price: "span.price__current"
+  description: "div.product__description"
+  sku: "span.product__sku"
+
+# =============================================================================
+# Image extraction
+# =============================================================================
+images:
+  # method: dom_selector | magento_json
+  method: dom_selector
+
+  # --- DOM selector method ---
+  selector: "div.product__media img"
+  attr: "src"
+  fallback_attr: "data-src"
+
+  # --- Magento JSON method ---
+  # method: magento_json
+  # script_contains: "mage/gallery/gallery"   # substring to identify the right <script>
+  # script_pattern: '"url":"(https?://[^"]+)"' # regex to extract image URLs
+
+# =============================================================================
+# Spec table extraction from the product page
+# =============================================================================
+spec_table:
+  # CSS selector for each spec row (e.g., a <tr> or <li>)
+  row_selector: "table.product-specs tr"
+  # Within each row, selector for the key cell
+  key_selector: "td:first-child"
+  # Within each row, selector for the value cell
+  value_selector: "td:last-child"
+
+  # Optional: extract specs from elements with aria-label attributes
+  # aria_label_selector: "span[aria-label]"
+
+  # Rows to include in the HTML spec table output.
+  # Types: static | scraped | label_value | aria_label | features_list
+  rows:
+    - type: static
+      label: "Brand"
+      value: "Brand Name"
+
+    - type: scraped
+      label: "Reference"
+      field: "sku"
+
+    - type: label_value
+      # Omit 'keys' to include ALL scraped spec key/value pairs.
+      # Or list specific keys to filter:
+      keys:
+        - "Case Material"
+        - "Dial Color"
+        - "Water Resistance"
+
+    # - type: features_list
+    #   label: "Features"
+
+# =============================================================================
+# Shopify field mappings
+# =============================================================================
+shopify_mapping:
+  vendor:
+    value: "Brand Name"   # constant string
+
+  type:
+    value: "Watches"      # constant, or use {source: "field_name"} to pull from scraped data
+
+  title:
+    source: "title"       # scraped field name
+
+  description:
+    source: "description"
+
+  price:
+    source: "price"
+
+  sku:
+    source: "sku"
+
+  published: "TRUE"       # TRUE or FALSE
+
+  tags:
+    static:               # always-added tags
+      - "watches"
+      - "new-arrivals"
+    # source: "category"  # optionally pull a tag from a scraped field
+
+# =============================================================================
+# Anti-bot / timing settings
+# =============================================================================
+anti_bot:
+  # Seconds to wait after page load before scraping
+  page_delay: 2
+
+  # Seconds to wait between image downloads
+  image_delay: 0.3
+
+  # Browser window size [width, height]
+  window_size: [1400, 900]
+
+  # Page load timeout in seconds
+  page_load_timeout: 60
+
+  # Optional: custom User-Agent string
+  # user_agent: "Mozilla/5.0 ..."
