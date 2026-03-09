@@ -93,17 +93,9 @@ def run_listing(brand: str, config: dict, mode: str = "listing", limit: int = No
         driver = build_driver(config.get("anti_bot", {}))
 
         logger.info("Step 1: Collecting product URLs...")
-        all_urls, url_gender_map = collect_urls(driver, config, limit=limit)
-
-        # Save urls_collected.txt — one URL per line, with gender label if known
-        url_lines = []
-        for url in all_urls:
-            gender = url_gender_map.get(url, "")
-            if gender:
-                url_lines.append(f"{url}  [{gender}]")
-            else:
-                url_lines.append(url)
-        ctx.path("urls_collected.txt").write_text("\n".join(url_lines), encoding="utf-8")
+        all_urls, url_gender_map, url_code_map = collect_urls(
+            driver, config, limit=limit, ctx=ctx
+        )
         counts["urls_collected"] = len(all_urls)
         ctx.log_event(f"Collected {len(all_urls)} product URLs")
 
@@ -177,7 +169,10 @@ def run_listing(brand: str, config: dict, mode: str = "listing", limit: int = No
     ctx.log_event(f"Downloaded {images_downloaded} images")
 
     logger.info("Step 5: Normalizing products...")
-    normalized = normalize_products(raw_products, config, image_map, brand, url_gender_map)
+    normalized = normalize_products(
+        raw_products, config, image_map, brand, url_gender_map,
+        url_code_map=url_code_map,
+    )
 
     # Export CSV to both: run folder and flat outputs/{brand}/ location
     run_csv_path = ctx.path("new_products.csv")
@@ -227,7 +222,7 @@ def run_drafting(brand: str, config: dict, limit: int = None) -> None:
         driver = build_driver(config.get("anti_bot", {}))
 
         logger.info("Step 1: Collecting all live product URLs...")
-        all_urls, _ = collect_urls(driver, config, limit=limit)
+        all_urls, _, _ = collect_urls(driver, config, limit=limit)
         if not all_urls:
             logger.warning("No URLs collected. Cannot determine removed products.")
             return

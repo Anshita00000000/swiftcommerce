@@ -48,18 +48,6 @@ def adapt(raw: dict) -> dict:
     # Pagination
     # -----------------------------------------------------------------------
     pag_raw = url_col.get("pagination", raw.get("pagination", {}))
-    pag_type = pag_raw.get("type", "none")
-
-    # Normalize pagination type names
-    type_map = {
-        "scroll": "infinite_scroll",
-        "infinite_scroll": "infinite_scroll",
-        "next_button": "next_button",
-        "load_more": "load_more",
-        "url_param": "url_param",
-        "none": "none",
-    }
-    pag_type = type_map.get(pag_type, pag_type)
 
     anti_bot_raw = raw.get("anti_bot", {})
     driver_raw = raw.get("driver", {})
@@ -70,16 +58,38 @@ def adapt(raw: dict) -> dict:
         or 3.0
     )
 
-    cfg["pagination"] = {
-        "type": pag_type,
-        "max_scrolls": pag_raw.get("max_scrolls", 60),
-        "scroll_pause": scroll_pause,
-        "next_button_selector": pag_raw.get("next_button_selector", ""),
-        "load_more_selector": pag_raw.get("load_more_selector", ""),
-        "max_pages": pag_raw.get("max_pages", 20),
-        # url_param pagination (Tissot)
-        "param_template": pag_raw.get("param", "?page={}"),
-    }
+    cfg["pagination"] = _normalize_pagination_block(pag_raw, scroll_pause)
+
+    # -----------------------------------------------------------------------
+    # Primary URL, primary pagination, gender URLs, code extraction
+    # -----------------------------------------------------------------------
+    cfg["primary_url"] = url_col.get("primary_url", "")
+
+    cfg["primary_pagination"] = _normalize_pagination_block(
+        url_col.get("primary_pagination") or pag_raw,
+        scroll_pause,
+    )
+
+    gender_urls_raw = url_col.get("gender_urls", [])
+    cfg["gender_urls"] = []
+    for entry in gender_urls_raw:
+        e_pag_raw = entry.get("pagination", pag_raw)
+        e_scroll_pause = (
+            anti_bot_raw.get("scroll_pause")
+            or e_pag_raw.get("scroll_pause")
+            or 3.0
+        )
+        cfg["gender_urls"].append({
+            "url": entry.get("url", ""),
+            "gender": entry.get("gender", ""),
+            "pagination": _normalize_pagination_block(e_pag_raw, e_scroll_pause),
+        })
+
+    cfg["code_extraction"] = url_col.get("code_extraction", {})
+
+    # Default gender — brand-level fallback for products not matched in any
+    # gender collection (e.g. a brand could set default_gender: "Men" in yaml)
+    cfg["default_gender"] = url_col.get("default_gender", "")
 
     # -----------------------------------------------------------------------
     # Per-field selectors (each stored as a list for fallback tries)
@@ -238,6 +248,30 @@ def adapt(raw: dict) -> dict:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+def _normalize_pagination_block(pag_raw: dict, scroll_pause: float) -> dict:
+    """Normalize a raw pagination dict into the internal pagination format."""
+    if not pag_raw:
+        pag_raw = {}
+    pag_type = pag_raw.get("type", "none")
+    type_map = {
+        "scroll": "infinite_scroll",
+        "infinite_scroll": "infinite_scroll",
+        "next_button": "next_button",
+        "load_more": "load_more",
+        "url_param": "url_param",
+        "none": "none",
+    }
+    return {
+        "type": type_map.get(pag_type, pag_type),
+        "max_scrolls": pag_raw.get("max_scrolls", 60),
+        "scroll_pause": pag_raw.get("scroll_pause", scroll_pause),
+        "next_button_selector": pag_raw.get("next_button_selector", ""),
+        "load_more_selector": pag_raw.get("load_more_selector", ""),
+        "max_pages": pag_raw.get("max_pages", 20),
+        "param_template": pag_raw.get("param", "?page={}"),
+    }
+
 
 def _as_list(val: Any) -> List[str]:
     """Ensure value is a list of non-empty strings."""
