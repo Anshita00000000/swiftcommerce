@@ -59,9 +59,10 @@ selectors:
     - ".product-description"
 
   features:
-    # Confirmed: bullet list <li> items with watch features
-    - ".product__description li"
-    - ".product-description li"
+    # Confirmed: <ul class="product-features-list"><li>...</li></ul>
+    - "ul.product-features-list li"
+    - ".product-features-list li"
+    - ".product__description li"    # fallback
 
   color: []
 
@@ -85,6 +86,20 @@ image_download:
   use_session_cookies: false
   referer: "https://seikousa.com/"
   user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+
+# ---------------------------------------------------------------------------
+# Spec extraction — drives product_scraper._extract_specs()
+# Two separate sections on seikousa.com product pages:
+#
+# 1) Additional Features: .feature-item > .feature-label + .feature-value
+#    e.g. Case Material, Water Resistance, Diameter, Lug Width, Strap, Movement
+#
+# 2) Technical Data: .techdata-grid > .label + .value (siblings, NOT parent-child)
+#    e.g. Diameter, Thickness, Length, Dial Color, Gender, Crystal Material
+#    Note: the Movement block only has .value divs (no .label), so we skip those.
+# ---------------------------------------------------------------------------
+spec_extraction:
+  type: seiko_dual               # custom type handled in product_scraper
 
 spec_table:
   header: "Item Specification"

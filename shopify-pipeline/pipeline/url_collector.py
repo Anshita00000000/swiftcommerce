@@ -18,7 +18,22 @@ from selenium.webdriver.support.ui import WebDriverWait
 logger = logging.getLogger(__name__)
 
 
-def collect_urls(driver, config: dict, limit: int = None) -> List[str]:
+def _gender_from_category_url(cat_url: str) -> str:
+    """
+    Infer gender from category URL keywords.
+    Returns 'Men', 'Women', or '' (unknown).
+    """
+    url_lower = cat_url.lower()
+    is_men   = any(kw in url_lower for kw in ["/mens", "/men/", "/men-", "men's", "gents"])
+    is_women = any(kw in url_lower for kw in ["/womens", "/women/", "/women-", "women's", "ladies"])
+    if is_men and not is_women:
+        return "Men"
+    if is_women and not is_men:
+        return "Women"
+    return ""
+
+
+def collect_urls(driver, config: dict, limit: int = None):
     """
     Collect all product URLs from the brand's category pages.
 
@@ -28,7 +43,9 @@ def collect_urls(driver, config: dict, limit: int = None) -> List[str]:
         limit: Optional max number of URLs to return (for testing).
 
     Returns:
-        Deduplicated list of product page URLs.
+        Tuple of:
+          - deduped list of product URLs
+          - url_gender_map: {normalized_url: 'Men'|'Women'|'Unisex'|''}
     """
     pagination = config.get("pagination", {})
     pagination_type = pagination.get("type", "none")
@@ -38,28 +55,47 @@ def collect_urls(driver, config: dict, limit: int = None) -> List[str]:
     base_url = config.get("base_url", "")
     anti_bot = config.get("anti_bot", {})
 
-    all_urls = []
+    # Track which collections each URL appears in
+    url_to_genders: dict = {}  # normalized_url -> set of genders
 
     for cat_url in category_urls:
-        logger.info(f"Collecting URLs from category: {cat_url}")
+        cat_gender = _gender_from_category_url(cat_url)
+        logger.info(f"Collecting URLs from category: {cat_url} (gender={cat_gender or 'unknown'})")
         try:
             urls = _collect_from_category(
                 driver, cat_url, pagination_type, pagination,
                 product_link_selector, base_url, anti_bot
             )
             logger.info(f"  Found {len(urls)} URLs in {cat_url}")
-            all_urls.extend(urls)
+            for url in urls:
+                norm = _normalize_url(url)
+                if norm not in url_to_genders:
+                    url_to_genders[norm] = set()
+                if cat_gender:
+                    url_to_genders[norm].add(cat_gender)
         except Exception as e:
             logger.error(f"  Failed to collect from {cat_url}: {e}")
 
-    # Deduplicate while preserving order (normalize to https for comparison)
+    # Resolve gender per URL
+    url_gender_map = {}
+    for norm_url, genders in url_to_genders.items():
+        if len(genders) == 0:
+            url_gender_map[norm_url] = ""
+        elif genders == {"Men"}:
+            url_gender_map[norm_url] = "Men"
+        elif genders == {"Women"}:
+            url_gender_map[norm_url] = "Women"
+        else:
+            url_gender_map[norm_url] = "Unisex"  # appeared in both men + women collections
+
+    # Deduplicate URLs while preserving order
     seen = set()
     deduped = []
-    for url in all_urls:
-        norm = _normalize_url(url)
-        if norm not in seen:
-            seen.add(norm)
-            deduped.append(url)
+    for norm_url in url_to_genders:
+        if norm_url not in seen:
+            seen.add(norm_url)
+            # Restore full https URL
+            deduped.append(norm_url if norm_url.startswith("http") else "https:" + norm_url)
 
     logger.info(f"Total unique product URLs collected: {len(deduped)}")
 
@@ -67,7 +103,7 @@ def collect_urls(driver, config: dict, limit: int = None) -> List[str]:
         deduped = deduped[:limit]
         logger.info(f"Limiting to {limit} URLs for testing.")
 
-    return deduped
+    return deduped, url_gender_map
 
 
 def _collect_from_category(

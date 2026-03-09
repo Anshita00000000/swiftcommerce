@@ -77,7 +77,7 @@ def run_listing(brand: str, config: dict, limit: int = None) -> None:
         driver = build_driver(config.get("anti_bot", {}))
 
         logger.info("Step 1: Collecting product URLs...")
-        all_urls = collect_urls(driver, config, limit=limit)
+        all_urls, url_gender_map = collect_urls(driver, config, limit=limit)
         if not all_urls:
             logger.warning("No URLs collected. Exiting.")
             return
@@ -119,7 +119,7 @@ def run_listing(brand: str, config: dict, limit: int = None) -> None:
             image_map[source_url] = []
 
     logger.info("Step 5: Normalizing products...")
-    normalized = normalize_products(raw_products, config, image_map, brand)
+    normalized = normalize_products(raw_products, config, image_map, brand, url_gender_map)
 
     out_path = Path("outputs") / brand / "new_products.csv"
     logger.info(f"Step 6: Exporting CSV to {out_path}...")
@@ -145,7 +145,7 @@ def run_drafting(brand: str, config: dict, limit: int = None) -> None:
         driver = build_driver(config.get("anti_bot", {}))
 
         logger.info("Step 1: Collecting all live product URLs...")
-        all_urls = collect_urls(driver, config, limit=limit)
+        all_urls, _ = collect_urls(driver, config, limit=limit)
         if not all_urls:
             logger.warning("No URLs collected. Cannot determine removed products.")
             return

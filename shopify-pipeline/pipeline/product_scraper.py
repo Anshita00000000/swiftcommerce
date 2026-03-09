@@ -170,6 +170,8 @@ def _extract_specs(soup: BeautifulSoup, spec_extraction: dict, spec_table_cfg: d
         return _specs_label_value(soup, spec_extraction)
     elif ext_type == "aria_label":
         return _specs_aria_label(soup, spec_extraction, spec_table_cfg)
+    elif ext_type == "seiko_dual":
+        return _specs_seiko_dual(soup)
     else:
         return _specs_row(soup, spec_extraction)
 
@@ -195,7 +197,61 @@ def _specs_row(soup: BeautifulSoup, spec_extraction: dict) -> Dict[str, str]:
     return specs
 
 
-def _specs_label_value(soup: BeautifulSoup, spec_extraction: dict) -> Dict[str, str]:
+def _specs_seiko_dual(soup: BeautifulSoup) -> Dict[str, str]:
+    """
+    Seiko USA has two distinct spec sections on the product page:
+
+    1) Additional Features (.feature-item blocks):
+       <div class="feature-item">
+         <div class="feature-label">Case Material</div>
+         <div class="feature-value">Two-tone stainless steel case</div>
+       </div>
+
+    2) Technical Data (.techdata-grid sibling divs):
+       <div class="techdata-grid techdatacase">
+         <div class="label">Diameter</div><div class="value">34 mm</div>
+         <div class="label">Thickness</div><div class="value">10.7 mm</div>
+       </div>
+       Note: the Movement grid only has .value divs (no .label) — those are skipped.
+    """
+    specs = {}
+
+    # --- Section 1: Additional Features ---
+    for item in soup.select("div.feature-item"):
+        try:
+            label_el = item.select_one(".feature-label")
+            value_el = item.select_one(".feature-value")
+            if label_el and value_el:
+                key = label_el.get_text(strip=True)
+                val = value_el.get_text(strip=True)
+                if key and val:
+                    specs[key] = val
+        except Exception:
+            pass
+
+    # --- Section 2: Technical Data (label+value are siblings inside .techdata-grid) ---
+    for grid in soup.select(".techdata-grid"):
+        try:
+            children = [c for c in grid.children if getattr(c, "name", None) == "div"]
+            # Walk through children in pairs: if div has class "label", next div is "value"
+            i = 0
+            while i < len(children):
+                child = children[i]
+                classes = child.get("class", [])
+                if "label" in classes:
+                    key = child.get_text(strip=True)
+                    # Next sibling should be the value
+                    if i + 1 < len(children):
+                        val = children[i + 1].get_text(strip=True)
+                        if key and val:
+                            specs[key] = val
+                        i += 2
+                        continue
+                i += 1
+        except Exception:
+            pass
+
+    return specs
     """Hamilton: parallel .attribute-label / .attribute-value elements (zipped)."""
     label_sel = spec_extraction.get("label_selector", ".attribute-label")
     value_sel = spec_extraction.get("value_selector", ".attribute-value")
