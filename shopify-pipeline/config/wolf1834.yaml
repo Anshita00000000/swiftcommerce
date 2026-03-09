@@ -18,8 +18,16 @@ url_collection:
   pagination:
     type: scroll
 
+  # Wolf has no gender collections
+  gender_urls: []
+
   product_link_selector: "a.product-item-link"
-  link_attribute: href
+
+  code_extraction:
+    source: "attribute"
+    selector: "form[data-product-sku]"
+    attribute: "data-product-sku"
+    normalize: "uppercase"
 
 driver:
   type: undetected

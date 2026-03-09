@@ -19,8 +19,27 @@ url_collection:
     param: "?page={}"
     max_pages: 20                    # Confirmed: scraper used pages 1-12
 
+  gender_urls:
+    - url: "https://www.tissotwatches.com/en-us/men.html"
+      gender: "Men"
+      pagination:
+        type: url_param
+        param: "?page={}"
+        max_pages: 15
+    - url: "https://www.tissotwatches.com/en-us/women.html"
+      gender: "Women"
+      pagination:
+        type: url_param
+        param: "?page={}"
+        max_pages: 15
+
   product_link_selector: "a.product-tile"
-  link_attribute: href
+
+  code_extraction:
+    source: "attribute"
+    selector: "[data-cbt-product-id]"
+    attribute: "data-cbt-product-id"
+    normalize: "uppercase"
 
 driver:
   type: undetected

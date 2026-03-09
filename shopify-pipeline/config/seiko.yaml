@@ -11,15 +11,35 @@ base_url: https://seikousa.com
 
 url_collection:
   type: category_scrape
-  category_urls:
-    - https://seikousa.com/collections/mens
-    - https://seikousa.com/collections/womens
 
-  pagination:
-    type: scroll                     # Confirmed: infinite scroll in original scraper
+  primary_url: "https://seikousa.com/collections/all"
+  primary_pagination:
+    type: scroll
+    scroll_pause: 3
+    max_scrolls: 60
 
-  product_link_selector: "#product-grid a[href*='/products/']"   # Confirmed from scraper
-  link_attribute: href
+  gender_urls:
+    - url: "https://seikousa.com/collections/mens"
+      gender: "Men"
+      pagination:
+        type: scroll
+        scroll_pause: 3
+        max_scrolls: 60
+    - url: "https://seikousa.com/collections/womens"
+      gender: "Women"
+      pagination:
+        type: scroll
+        scroll_pause: 3
+        max_scrolls: 60
+
+  product_link_selector: "#product-grid a[href*='/products/']"
+
+  code_extraction:
+    source: "attribute"
+    # Seiko listing cards have data-sku on a parent element of the product link
+    selector: "[data-sku]"
+    attribute: "data-sku"
+    normalize: "uppercase"
 
 driver:
   type: undetected

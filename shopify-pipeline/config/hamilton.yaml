@@ -10,20 +10,34 @@ base_url: https://www.hamiltonwatch.com
 
 url_collection:
   type: category_scrape
-  category_urls:
-    - https://www.hamiltonwatch.com/en-us/collection.html
-    - https://www.hamiltonwatch.com/en-us/collection/khaki-field.html
-    - https://www.hamiltonwatch.com/en-us/collection/khaki-aviation.html
-    - https://www.hamiltonwatch.com/en-us/collection/khaki-navy.html
-    - https://www.hamiltonwatch.com/en-us/collection/american-classic.html
-    - https://www.hamiltonwatch.com/en-us/collection/jazz-master.html
-    # Add more collections as needed
 
-  pagination:
-    type: scroll                     # Hamilton uses infinite scroll
+  primary_url: "https://www.hamiltonwatch.com/en-us/filter-by.html"
+  primary_pagination:
+    type: scroll
+    scroll_pause: 3
+    max_scrolls: 60
+
+  gender_urls:
+    - url: "https://www.hamiltonwatch.com/en-us/filter-by/mens-watches.html"
+      gender: "Men"
+      pagination:
+        type: scroll
+        scroll_pause: 3
+        max_scrolls: 60
+    - url: "https://www.hamiltonwatch.com/en-us/filter-by/womens-watches.html"
+      gender: "Women"
+      pagination:
+        type: scroll
+        scroll_pause: 3
+        max_scrolls: 60
 
   product_link_selector: "a.product-item-link"
-  link_attribute: href
+
+  code_extraction:
+    source: "url"
+    pattern: "last_segment_after_final_hyphen"
+    normalize: "uppercase"
+    # e.g. /en-us/broadway-quartz-h43311135.html → H43311135
 
 driver:
   type: undetected
