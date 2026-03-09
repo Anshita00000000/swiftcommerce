@@ -206,6 +206,8 @@ def collect_urls(
             f"{n_unisex} Unisex | {n_unknown} unknown gender"
         )
         lines = [header]
+        men_lines: List[str] = []
+        women_lines: List[str] = []
         for url in all_urls:
             norm = _normalize_url(url)
             code = url_code_map.get(norm, "")
@@ -213,7 +215,21 @@ def collect_urls(
             lines.append(
                 f"{url}  |  code={code or '?'}  |  gender={gender or 'unknown'}"
             )
+            if gender == "Men":
+                men_lines.append(url)
+            elif gender == "Women":
+                women_lines.append(url)
         ctx.path("urls_collected.txt").write_text("\n".join(lines), encoding="utf-8")
+
+        men_header = f"# {timestamp} | {brand} | {len(men_lines)} Men URLs"
+        ctx.path("men_urls.txt").write_text(
+            "\n".join([men_header] + men_lines), encoding="utf-8"
+        )
+
+        women_header = f"# {timestamp} | {brand} | {len(women_lines)} Women URLs"
+        ctx.path("women_urls.txt").write_text(
+            "\n".join([women_header] + women_lines), encoding="utf-8"
+        )
 
     logger.info(f"Total unique product URLs collected: {len(all_urls)}")
 
