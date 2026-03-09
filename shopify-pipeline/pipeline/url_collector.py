@@ -128,13 +128,33 @@ def collect_urls(
             driver, g_url, g_pag,
             code_extraction, anti_bot, product_link_selector, base_url,
         )
+        raw_count = len(pairs)
+
+        # Dedup within the gender collection for accurate unique-count logging
+        seen_g: set = set()
+        unique_pairs: List[Dict] = []
+        for p in pairs:
+            g_norm = _normalize_url(p["url"])
+            if g_norm not in seen_g:
+                seen_g.add(g_norm)
+                unique_pairs.append(p)
+        dedup_count = len(unique_pairs)
+        scroll_dups = raw_count - dedup_count
+
         gender_collection_results.append({
             "gender": g_gender,
             "url": g_url,
-            "pairs": pairs,
+            "pairs": unique_pairs,
         })
 
-        msg = f"{g_gender} collection ({g_url}): {len(pairs)} URLs collected"
+        if scroll_dups > 0:
+            msg = (
+                f"{g_gender} collection ({g_url}): "
+                f"{dedup_count} unique URLs "
+                f"({raw_count} raw extracted, {scroll_dups} scroll duplicates removed)"
+            )
+        else:
+            msg = f"{g_gender} collection ({g_url}): {dedup_count} unique URLs"
         logger.info(msg)
         if ctx:
             ctx.log_event(msg)
@@ -233,6 +253,11 @@ def collect_urls(
 
     logger.info(f"Total unique product URLs collected: {len(all_urls)}")
 
+    # Record total found BEFORE limit so run_summary.txt can show the real count
+    if ctx:
+        ctx._urls_collected_total = len(all_urls)
+        ctx._urls_after_limit = min(limit, len(all_urls)) if limit else len(all_urls)
+
     # Apply limit AFTER all collection and cross-referencing
     if limit:
         all_urls = all_urls[:limit]
@@ -245,6 +270,12 @@ def collect_urls(
 # Cross-reference: build gender and code maps from master + gender results
 # ---------------------------------------------------------------------------
 
+def _get_slug(url: str) -> str:
+    """Extract the product slug from a URL (/products/{slug} part)."""
+    m = re.search(r'/products/([^/?#]+)', url.lower().strip())
+    return m.group(1) if m else ''
+
+
 def _build_gender_map(
     master_entries: List[Dict],
     gender_collection_results: List[Dict],
@@ -253,8 +284,9 @@ def _build_gender_map(
     """
     Match master entries against gender collection results.
 
-    Matching uses normalized_url equality first; falls back to code equality
-    if both the master entry and the gender collection entry have a non-empty code.
+    Matching uses slug equality (/products/{slug}) so that URLs from different
+    collection paths (e.g. /collections/all vs /collections/mens) still match.
+    Falls back to code equality if both sides have a non-empty product code.
 
     Returns:
         url_gender_map       — {normalized_url: "Men"|"Women"|"Unisex"|""}
@@ -262,24 +294,35 @@ def _build_gender_map(
         unknown_gender       — list of normalized_urls with no gender match
                                and no default_gender set
         missing_from_primary — list of gender-collection normalized_urls
-                               not found in master
+                               not found in master (by slug)
     """
-    # Build per-gender sets of normalized URLs and codes
+    # Build per-gender sets of normalized URLs, slugs, and codes
     gender_url_sets: Dict[str, set] = {}
     gender_code_sets: Dict[str, set] = {}
+    gender_slug_sets: Dict[str, set] = {}
     all_gender_norms: set = set()
 
     for gcr in gender_collection_results:
         gender = gcr["gender"]
         gender_url_sets.setdefault(gender, set())
         gender_code_sets.setdefault(gender, set())
+        gender_slug_sets.setdefault(gender, set())
         for pair in gcr["pairs"]:
             norm = _normalize_url(pair["url"])
             gender_url_sets[gender].add(norm)
             all_gender_norms.add(norm)
+            slug = _get_slug(norm)
+            if slug:
+                gender_slug_sets[gender].add(slug)
             if pair["code"]:
                 gender_code_sets[gender].add(pair["code"])
 
+    # Build slug-keyed lookup from primary for missing_from_primary check
+    primary_by_slug = {
+        _get_slug(e["normalized_url"]): e["normalized_url"]
+        for e in master_entries
+    }
+    master_slugs = {s for s in primary_by_slug if s}
     master_norms = {e["normalized_url"] for e in master_entries}
 
     url_gender_map: Dict[str, str] = {}
@@ -290,10 +333,13 @@ def _build_gender_map(
         norm = entry["normalized_url"]
         code = entry["code"]
         url_code_map[norm] = code
+        entry_slug = _get_slug(norm)
 
         matched_genders: set = set()
         for gender, g_url_set in gender_url_sets.items():
             if norm in g_url_set:
+                matched_genders.add(gender)
+            elif entry_slug and entry_slug in gender_slug_sets.get(gender, set()):
                 matched_genders.add(gender)
             elif code and code in gender_code_sets.get(gender, set()):
                 matched_genders.add(gender)
@@ -309,7 +355,12 @@ def _build_gender_map(
         else:
             url_gender_map[norm] = "Unisex"
 
-    missing_from_primary = [u for u in all_gender_norms if u not in master_norms]
+    # A product is only "missing from primary" if its slug does NOT appear in
+    # primary_by_slug at all — avoids false positives from URL path differences
+    missing_from_primary = [
+        u for u in all_gender_norms
+        if u not in master_norms and _get_slug(u) not in master_slugs
+    ]
 
     return url_gender_map, url_code_map, unknown_gender, missing_from_primary
 
