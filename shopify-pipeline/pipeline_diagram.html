@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shopify Pipeline Diagrams — Seiko</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    padding: 32px 24px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .page-sub {
+    text-align: center;
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 40px;
+  }
+
+  /* ── Section headers ── */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 48px 0 24px;
+  }
+  .section-label .badge {
+    background: #1a1a2e;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .section-label h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+  .section-label .cmd {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    background: #1a1a2e;
+    color: #7ee787;
+    padding: 5px 14px;
+    border-radius: 6px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding: 16px 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #333;
+  }
+  .legend-dot {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .dot-blue   { background: #2563eb; }
+  .dot-green  { background: #16a34a; }
+  .dot-orange { background: #ea580c; }
+  .dot-red    { background: #dc2626; }
+  .dot-purple { background: #7c3aed; }
+
+  /* ── Pipeline container ── */
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ── Step card ── */
+  .step {
+    display: flex;
+    width: 100%;
+    max-width: 860px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -1px;
+  }
+
+  .step-body {
+    flex: 1;
+    padding: 18px 22px;
+  }
+
+  .step-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+    line-height: 1.3;
+  }
+
+  .step-desc {
+    font-size: 0.9rem;
+    color: #444;
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+
+  .step-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+
+  .tag-file {
+    background: #f3f3f3;
+    color: #555;
+    border: 1px solid #ddd;
+  }
+  .tag-output {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+  }
+  .tag-warning {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+  }
+  .tag-input {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+  }
+
+  /* ── Color variants ── */
+  .blue   .step-number { background: #2563eb; }
+  .green  .step-number { background: #16a34a; }
+  .orange .step-number { background: #ea580c; }
+  .red    .step-number { background: #dc2626; }
+  .purple .step-number { background: #7c3aed; }
+
+  .blue   { border-left: 5px solid #2563eb; }
+  .green  { border-left: 5px solid #16a34a; }
+  .orange { border-left: 5px solid #ea580c; }
+  .red    { border-left: 5px solid #dc2626; }
+  .purple { border-left: 5px solid #7c3aed; }
+
+  /* ── Arrow ── */
+  .arrow {
+    width: 3px;
+    height: 28px;
+    background: linear-gradient(to bottom, #94a3b8, #64748b);
+    position: relative;
+    margin: 0 auto;
+  }
+  .arrow::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 9px solid #64748b;
+  }
+
+  /* ── Early-exit note ── */
+  .exit-note {
+    width: 100%;
+    max-width: 860px;
+    background: #fef9c3;
+    border: 1.5px dashed #ca8a04;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 0.83rem;
+    color: #713f12;
+    margin: 8px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .exit-note .icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Folder tree ── */
+  .folder-tree {
+    background: #1a1a2e;
+    color: #e2e8f0;
+    border-radius: 14px;
+    padding: 24px 28px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    max-width: 860px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .folder-tree .folder   { color: #93c5fd; font-weight: 700; }
+  .folder-tree .file-csv { color: #86efac; font-weight: 600; }
+  .folder-tree .file-img { color: #fdba74; }
+  .folder-tree .file-txt { color: #c4b5fd; }
+  .folder-tree .file-json{ color: #fde68a; }
+  .folder-tree .note     { color: #94a3b8; font-style: italic; }
+  .folder-tree .star     { color: #fbbf24; }
+
+  /* ── Config table ── */
+  .config-table-wrap {
+    max-width: 860px;
+    width: 100%;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+  table.config-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    font-size: 0.88rem;
+  }
+  table.config-table thead tr {
+    background: #1a1a2e;
+    color: #fff;
+  }
+  table.config-table th {
+    padding: 13px 18px;
+    text-align: left;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  table.config-table td {
+    padding: 11px 18px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  table.config-table tr:last-child td {
+    border-bottom: none;
+  }
+  table.config-table tr:nth-child(even) { background: #f8fafc; }
+  table.config-table td:first-child {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    color: #2563eb;
+    font-weight: 700;
+    white-space: nowrap;
+    width: 260px;
+  }
+  table.config-table td:last-child {
+    color: #334155;
+  }
+  table.config-table .section-row td {
+    background: #eff6ff;
+    color: #1e40af;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    font-family: inherit;
+  }
+
+  /* ── Mode comparison ── */
+  .mode-compare {
+    display: flex;
+    gap: 20px;
+    max-width: 860px;
+    width: 100%;
+    margin: 0 auto 12px;
+    flex-wrap: wrap;
+  }
+  .mode-card {
+    flex: 1;
+    min-width: 220px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 18px 20px;
+  }
+  .mode-card h4 {
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .mode-card ul {
+    padding-left: 18px;
+    font-size: 0.85rem;
+    color: #444;
+    line-height: 1.7;
+  }
+  .mode-card.listing h4 { color: #2563eb; }
+  .mode-card.drafting h4 { color: #7c3aed; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    margin-top: 60px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+  }
+
+  @media (max-width: 640px) {
+    .step { flex-direction: column; }
+    .step-number { min-width: 100%; min-height: 40px; font-size: 1rem; }
+    .section-label .cmd { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🕐 Shopify Product Pipeline</h1>
+<p class="page-sub">Brand: <strong>Seiko</strong> &nbsp;·&nbsp; Visual guide to what happens when you run the pipeline</p>
+
+<!-- ═══════════════════════════════════════════════════════
+     LEGEND
+═══════════════════════════════════════════════════════ -->
+<div class="legend" style="max-width:860px;margin:0 auto 32px;">
+  <div class="legend-item"><div class="legend-dot dot-blue"></div> Collection &amp; Scraping — visiting the website</div>
+  <div class="legend-item"><div class="legend-dot dot-green"></div> Processing — cleaning &amp; organising data</div>
+  <div class="legend-item"><div class="legend-dot dot-orange"></div> Output files — files saved to your computer</div>
+  <div class="legend-item"><div class="legend-dot dot-red"></div> Warnings &amp; early exits</div>
+  <div class="legend-item"><div class="legend-dot dot-purple"></div> Shopify-ready output</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     DIAGRAM 1 — LISTING MODE
+═══════════════════════════════════════════════════════ -->
+<div class="section-label" style="max-width:860px;margin:0 auto 24px;">
+  <span class="badge">Diagram 1</span>
+  <h2>Listing Mode</h2>
+  <span class="cmd">py run.py --brand seiko --mode listing</span>
+</div>
+
+<p style="max-width:860px;margin:0 auto 20px;font-size:0.9rem;color:#555;line-height:1.6;">
+  <strong>Purpose:</strong> Find brand-new products on the Seiko website that don't yet exist in your Shopify store, scrape their details, download their photos, and produce a ready-to-import CSV file.
+</p>
+
+<div class="mode-compare">
+  <div class="mode-card listing">
+    <h4>✅ Use LISTING when…</h4>
+    <ul>
+      <li>New watches appear on the website</li>
+      <li>You want to add products to Shopify</li>
+      <li>Running your regular refresh schedule</li>
+    </ul>
+  </div>
+  <div class="mode-card" style="border-left:4px solid #ea580c;">
+    <h4 style="color:#ea580c;">📂 What you get at the end</h4>
+    <ul>
+      <li><strong>new_products.csv</strong> — import into Shopify</li>
+      <li><strong>images/</strong> — downloaded product photos</li>
+      <li><strong>master_catalog.csv</strong> — running history</li>
+      <li><strong>run_summary.txt</strong> — what happened &amp; counts</li>
+    </ul>
+  </div>
+</div>
+
+<div class="pipeline" style="margin-bottom: 16px;">
+
+  <!-- STEP 0 -->
+  <div class="step blue">
+    <div class="step-number">0</div>
+    <div class="step-body">
+      <div class="step-title">Startup — Read Config &amp; Set Up Logging</div>
+      <div class="step-desc">
+        Reads <strong>config/seiko.yaml</strong> to learn the website URL, which HTML elements contain product data, how to handle anti-bot delays, and what Shopify fields to fill. Creates a log file so you can review what happened. Also creates a timestamped folder inside <code>outputs/seiko/</code> to hold this run's files.
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">run.py</span>
+        <span class="tag tag-file">config_adapter.py</span>
+        <span class="tag tag-input">reads: config/seiko.yaml</span>
+        <span class="tag tag-output">creates: logs/seiko_YYYY-MM-DD.log</span>
+        <span class="tag tag-output">creates: outputs/seiko/YYYYMMDD_HHMMSS/ folder</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- STEP 1 -->
+  <div class="step blue">
+    <div class="step-number">1</div>
+    <div class="step-body">
+      <div class="step-title">Collect All Product URLs from Seiko Website</div>
+      <div class="step-desc">
+        Opens a hidden Chrome browser and visits <strong>seikousa.com/collections/all</strong>. Slowly scrolls down (up to 60 times) to load all products. Then visits the <strong>Men's</strong> and <strong>Women's</strong> collection pages separately so it knows which gender each watch belongs to. Extracts every product link and the SKU code from each product card.
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">url_collector.py</span>
+        <span class="tag tag-output">saves: urls_collected.txt</span>
+        <span class="tag tag-output">saves: men_urls.txt</span>
+        <span class="tag tag-output">saves: women_urls.txt</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <div class="exit-note">
+    <span class="icon">⚠️</span>
+    <span><strong>Early exit:</strong> If zero URLs are found (website unreachable, anti-bot blocked, or selector broken), the pipeline stops here and writes a summary.</span>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- STEP 2 -->
+  <div class="step green">
+    <div class="step-number">2</div>
+    <div class="step-body">
+      <div class="step-title">Deduplicate — Remove Products Already in Shopify</div>
+      <div class="step-desc">
+        Opens <strong>shopify_exports/seiko_shopify.csv</strong> (your current Shopify product export) and compares every collected URL against it. Any product already in Shopify is removed from the list. Only truly new products move forward. The count of new vs. existing is logged.
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">deduplicator.py</span>
+        <span class="tag tag-input">reads: shopify_exports/seiko_shopify.csv</span>
+        <span class="tag tag-output">saves: new_urls.txt</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <div class="exit-note">
+    <span class="icon">⚠️</span>
+    <span><strong>Early exit:</strong> If all URLs already exist in Shopify (nothing new), the pipeline stops and writes a detailed explanation in run_summary.txt.</span>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- STEP 3 -->
+  <div class="step blue">
+    <div class="step-number">3</div>
+    <div class="step-body">
+      <div class="step-title">Scrape Each New Product Page</div>
+      <div class="step-desc">
+        Visits every new product URL one by one in Chrome. On each page it scrolls slowly to trigger any lazy-loaded content, then extracts:
+        <ul style="margin:8px 0 0 18px;font-size:0.88rem;color:#444;line-height:1.7;">
+          <li><strong>Title</strong> — the watch's name</li>
+          <li><strong>Price</strong> — current selling price</li>
+          <li><strong>SKU</strong> — model code (e.g. SRPL61)</li>
+          <li><strong>Description</strong> — product text</li>
+          <li><strong>Specs</strong> — movement, case material, diameter, water resistance, etc.</li>
+          <li><strong>Feature bullets</strong> — list of key features</li>
+          <li><strong>Image URLs</strong> — links to all product photos</li>
+        </ul>
+        Waits 3–6 random seconds between each page to avoid bot detection.
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">product_scraper.py</span>
+        <span class="tag tag-output">saves: scraped_products.json</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <div class="exit-note">
+    <span class="icon">⚠️</span>
+    <span><strong>Early exit:</strong> If all product pages failed to scrape (e.g. all blocked), pipeline stops. Individual page failures are logged as warnings but don't stop the run.</span>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- STEP 4 -->
+  <div class="step blue">
+    <div class="step-number">4</div>
+    <div class="step-body">
+      <div class="step-title">Download Product Images</div>
+      <div class="step-desc">
+        Downloads every product photo to your local computer. Each product gets its own subfolder named after the product handle (e.g. <code>seiko-srpl61</code>). Images are saved in <code>outputs/seiko/images/</code>. Already-downloaded images are skipped so re-running is safe. Waits 0.3 seconds between each image download.
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">image_downloader.py</span>
+        <span class="tag tag-output">saves: outputs/seiko/images/{product-name}/photo.jpg</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- STEP 5 -->
+  <div class="step green">
+    <div class="step-number">5</div>
+    <div class="step-body">
+      <div class="step-title">Normalize — Clean &amp; Format for Shopify</div>
+      <div class="step-desc">
+        Transforms raw scraped data into clean, Shopify-ready product records:
+        <ul style="margin:8px 0 0 18px;font-size:0.88rem;color:#444;line-height:1.7;">
+          <li>Cleans up titles (removes junk like "try on your wrist" text, falls back to SKU if needed)</li>
+          <li>Strips currency symbols from prices</li>
+          <li>Assigns gender (Men / Women / Unisex) based on which collection pages it appeared in</li>
+          <li>Builds an HTML spec table (Brand, Model, Movement, Case Material, Diameter, etc.)</li>
+          <li>Combines description + spec table + optional footer into the product's Body HTML</li>
+          <li>Fills all Shopify metafields (band material, dial color, water resistance, etc.)</li>
+        </ul>
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">normalizer.py</span>
+        <span class="tag tag-input">reads: config/footer.html (if exists)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- STEP 6 -->
+  <div class="step purple">
+    <div class="step-number">6</div>
+    <div class="step-body">
+      <div class="step-title">Export Shopify CSV</div>
+      <div class="step-desc">
+        Writes the finished product data into Shopify's exact 86-column CSV format. Each product becomes one primary row (with all details), plus extra rows for additional images. Products are set to <strong>Draft</strong> status so they don't go live automatically — you review them first. The CSV is saved in two places: a flat location for easy access, and the timestamped run folder.
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">exporter.py</span>
+        <span class="tag tag-output">⭐ saves: outputs/seiko/new_products.csv</span>
+        <span class="tag tag-output">saves: outputs/seiko/TIMESTAMP/new_products.csv</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- STEP 7 -->
+  <div class="step green">
+    <div class="step-number">7</div>
+    <div class="step-body">
+      <div class="step-title">Update Master Catalog</div>
+      <div class="step-desc">
+        Updates <strong>master_catalog.csv</strong> — a running history of every product ever scraped. New products are added with a "first seen" date. Products seen in previous runs get their "last seen" date and run count updated. This builds up over time and gives you a complete picture of your catalog history.
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">inventory_manager.py</span>
+        <span class="tag tag-output">⭐ updates: outputs/seiko/master_catalog.csv</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- STEP 8 -->
+  <div class="step orange">
+    <div class="step-number">8</div>
+    <div class="step-body">
+      <div class="step-title">Save Run Summary &amp; Copy to "latest" Folder</div>
+      <div class="step-desc">
+        Writes a <strong>run_summary.txt</strong> file with a full count of everything that happened: URLs collected, new products found, products scraped, images downloaded, CSV rows exported, catalog totals, and total runtime. Then copies the entire run folder to <code>outputs/seiko/latest/</code> so you can always find the most recent results without knowing the timestamp.
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">run_context.py</span>
+        <span class="tag tag-output">saves: outputs/seiko/TIMESTAMP/run_summary.txt</span>
+        <span class="tag tag-output">copies everything → outputs/seiko/latest/</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     DIAGRAM 2 — DRAFTING MODE
+═══════════════════════════════════════════════════════ -->
+<div class="section-label" style="max-width:860px;margin:48px auto 24px;">
+  <span class="badge">Diagram 2</span>
+  <h2>Drafting Mode</h2>
+  <span class="cmd">py run.py --brand seiko --mode drafting</span>
+</div>
+
+<p style="max-width:860px;margin:0 auto 20px;font-size:0.9rem;color:#555;line-height:1.6;">
+  <strong>Purpose:</strong> Find products that are <em>already in your Shopify store</em> but have been <em>removed from the Seiko website</em> (discontinued, out of stock, etc.) and generate a CSV to set them as Draft so they stop appearing in your store.
+</p>
+
+<div class="mode-compare">
+  <div class="mode-card drafting">
+    <h4>✅ Use DRAFTING when…</h4>
+    <ul>
+      <li>Seiko discontinues a watch model</li>
+      <li>Products disappear from their website</li>
+      <li>You want to clean up your Shopify store</li>
+      <li>Running a periodic "clean-up" sweep</li>
+    </ul>
+  </div>
+  <div class="mode-card" style="border-left:4px solid #7c3aed;">
+    <h4 style="color:#7c3aed;">📂 What you get at the end</h4>
+    <ul>
+      <li><strong>draft_products.csv</strong> — import into Shopify to set removed products to Draft</li>
+      <li>Each product in the CSV gets the tag <code>swithommerce_PD</code> added</li>
+      <li>Products are set to <code>Published = FALSE</code></li>
+    </ul>
+  </div>
+</div>
+
+<div class="pipeline" style="margin-bottom: 16px;">
+
+  <!-- STEP 0 -->
+  <div class="step blue">
+    <div class="step-number">0</div>
+    <div class="step-body">
+      <div class="step-title">Startup — Read Config</div>
+      <div class="step-desc">
+        Same as Listing mode — reads <strong>config/seiko.yaml</strong> and sets up logging. No timestamped run folder is created in this mode.
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">run.py</span>
+        <span class="tag tag-file">config_adapter.py</span>
+        <span class="tag tag-input">reads: config/seiko.yaml</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- STEP 1 -->
+  <div class="step blue">
+    <div class="step-number">1</div>
+    <div class="step-body">
+      <div class="step-title">Collect All Currently-Live Product URLs</div>
+      <div class="step-desc">
+        Identical to Listing mode Step 1 — opens Chrome and visits the Seiko website to get a complete, up-to-date list of every product that is <strong>currently live</strong> on seikousa.com. This becomes our reference of "what is still available."
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">url_collector.py</span>
+        <span class="tag tag-input">visits: seikousa.com (live website)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <div class="exit-note">
+    <span class="icon">⚠️</span>
+    <span><strong>Early exit:</strong> If zero URLs are collected, we can't determine what's been removed, so the pipeline stops immediately.</span>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- STEP 2 -->
+  <div class="step green">
+    <div class="step-number">2</div>
+    <div class="step-body">
+      <div class="step-title">Find Products in Shopify That Are No Longer on the Website</div>
+      <div class="step-desc">
+        Opens <strong>shopify_exports/seiko_shopify.csv</strong> and goes through every product in your Shopify store. For each product, it checks whether its source URL still appears in the list of live website URLs. Any Shopify product whose URL is <strong>not</strong> found on the current website is flagged as "removed."
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">deduplicator.py</span>
+        <span class="tag tag-input">reads: shopify_exports/seiko_shopify.csv</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <div class="exit-note">
+    <span class="icon">✅</span>
+    <span><strong>Happy exit:</strong> If all Shopify products are still found on the website (nothing removed), the pipeline finishes cleanly with a message "no products to draft."</span>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- STEP 3 -->
+  <div class="step purple">
+    <div class="step-number">3</div>
+    <div class="step-body">
+      <div class="step-title">Build Draft CSV — Mark Removed Products</div>
+      <div class="step-desc">
+        For every product identified as removed, creates a CSV row that sets:
+        <ul style="margin:8px 0 0 18px;font-size:0.88rem;color:#444;line-height:1.7;">
+          <li><strong>Published → FALSE</strong> (hides it from the storefront)</li>
+          <li><strong>Tags → adds "swithommerce_PD"</strong> to the product's existing tags</li>
+        </ul>
+        When you import this CSV into Shopify, those products automatically move to Draft status. Nothing is deleted — the products still exist in Shopify, just hidden from customers.
+      </div>
+      <div class="step-meta">
+        <span class="tag tag-file">drafter.py</span>
+        <span class="tag tag-output">⭐ saves: outputs/seiko/draft_products.csv</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     FOLDER TREE
+═══════════════════════════════════════════════════════ -->
+<div class="section-label" style="max-width:860px;margin:48px auto 20px;">
+  <span class="badge">Reference</span>
+  <h2>Output Folder Structure</h2>
+</div>
+<p style="max-width:860px;margin:0 auto 16px;font-size:0.9rem;color:#555;">
+  After running <strong>Listing mode</strong> for Seiko, here is what gets created inside the <code>outputs/</code> folder:
+</p>
+
+<div class="folder-tree">
+<span class="folder">outputs/</span>
+└── <span class="folder">seiko/</span>
+    │
+    ├── <span class="file-csv star">new_products.csv</span>          <span class="note">← ⭐ IMPORT THIS into Shopify</span>
+    ├── <span class="file-csv">master_catalog.csv</span>        <span class="note">← running history of all products ever seen</span>
+    ├── <span class="file-csv">draft_products.csv</span>        <span class="note">← (only exists after Drafting mode run)</span>
+    │
+    ├── <span class="folder">images/</span>                    <span class="note">← downloaded product photos</span>
+    │   ├── <span class="folder">seiko-srpl61/</span>
+    │   │   ├── <span class="file-img">SRPL61_1.png</span>
+    │   │   ├── <span class="file-img">SRPL61_2.png</span>
+    │   │   └── <span class="file-img">SRPL61_3.png</span>
+    │   └── <span class="folder">seiko-ssc929/</span>
+    │       └── <span class="file-img">SSC929_1.png</span>
+    │
+    ├── <span class="folder">20250309_143022/</span>           <span class="note">← timestamped folder for THIS run</span>
+    │   ├── <span class="file-txt">urls_collected.txt</span>        <span class="note">← all URLs found + gender + code</span>
+    │   ├── <span class="file-txt">men_urls.txt</span>              <span class="note">← Men's URLs only</span>
+    │   ├── <span class="file-txt">women_urls.txt</span>            <span class="note">← Women's URLs only</span>
+    │   ├── <span class="file-txt">new_urls.txt</span>              <span class="note">← URLs not yet in Shopify</span>
+    │   ├── <span class="file-json">scraped_products.json</span>     <span class="note">← raw data from each product page</span>
+    │   ├── <span class="file-csv">new_products.csv</span>          <span class="note">← copy of the Shopify CSV for this run</span>
+    │   └── <span class="file-txt">run_summary.txt</span>           <span class="note">← counts, events, runtime</span>
+    │
+    └── <span class="folder">latest/</span>                    <span class="note">← always a copy of the most recent run</span>
+        ├── <span class="file-txt">urls_collected.txt</span>
+        ├── <span class="file-txt">men_urls.txt</span>
+        ├── <span class="file-txt">women_urls.txt</span>
+        ├── <span class="file-txt">new_urls.txt</span>
+        ├── <span class="file-json">scraped_products.json</span>
+        ├── <span class="file-csv">new_products.csv</span>
+        └── <span class="file-txt">run_summary.txt</span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     CONFIG TABLE
+═══════════════════════════════════════════════════════ -->
+<div class="section-label" style="max-width:860px;margin:48px auto 20px;">
+  <span class="badge">Reference</span>
+  <h2>seiko.yaml — What Each Setting Controls</h2>
+</div>
+
+<div class="config-table-wrap">
+<table class="config-table">
+  <thead>
+    <tr>
+      <th>Config Key</th>
+      <th>What it controls in plain English</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <tr class="section-row"><td colspan="2">🌐 Website Identity</td></tr>
+    <tr>
+      <td>brand</td>
+      <td>Internal code name used for folder names and file names (seiko)</td>
+    </tr>
+    <tr>
+      <td>display_name</td>
+      <td>Human-readable brand name used in Shopify product listings ("Seiko")</td>
+    </tr>
+    <tr>
+      <td>base_url</td>
+      <td>The root website address — all relative links are resolved against this</td>
+    </tr>
+
+    <tr class="section-row"><td colspan="2">🔗 URL Collection — Finding Products</td></tr>
+    <tr>
+      <td>url_collection.primary_url</td>
+      <td>The "all products" page to visit first — this is where all watch URLs are gathered from</td>
+    </tr>
+    <tr>
+      <td>url_collection.gender_urls</td>
+      <td>Separate Men's and Women's collection pages — used only to label each watch's gender, not to add new URLs</td>
+    </tr>
+    <tr>
+      <td>url_collection.product_link_selector</td>
+      <td>The HTML "address" that tells the scraper where the clickable product links are on the page</td>
+    </tr>
+    <tr>
+      <td>url_collection.code_extraction</td>
+      <td>How to read the SKU code from each product card on the listing page (looks at a <code>data-sku</code> HTML attribute)</td>
+    </tr>
+    <tr>
+      <td>primary_pagination.type: scroll</td>
+      <td>The page loads more products by scrolling — the scraper keeps scrolling until no more appear</td>
+    </tr>
+    <tr>
+      <td>primary_pagination.max_scrolls</td>
+      <td>Maximum number of scroll actions before giving up (60 scrolls = very long pages covered)</td>
+    </tr>
+    <tr>
+      <td>primary_pagination.scroll_pause</td>
+      <td>Seconds to wait after each scroll before checking if new products have appeared (3 seconds)</td>
+    </tr>
+
+    <tr class="section-row"><td colspan="2">🤖 Browser &amp; Anti-Bot Settings</td></tr>
+    <tr>
+      <td>driver.type: undetected</td>
+      <td>Use a special "stealth" Chrome browser that websites can't easily identify as a bot</td>
+    </tr>
+    <tr>
+      <td>driver.first_load_wait</td>
+      <td>Wait 15 seconds after opening the first page — gives the website time to fully load before scraping starts</td>
+    </tr>
+    <tr>
+      <td>anti_bot.random_delay_min/max</td>
+      <td>Wait a random 3–6 seconds between visiting each product page, so the scraper looks like a human browsing</td>
+    </tr>
+    <tr>
+      <td>anti_bot.slow_scroll</td>
+      <td>Scroll down in small steps instead of jumping to the bottom — triggers lazy-loaded content and looks more human</td>
+    </tr>
+    <tr>
+      <td>anti_bot.scroll_pause</td>
+      <td>Seconds to pause between each scroll step (3 seconds)</td>
+    </tr>
+
+    <tr class="section-row"><td colspan="2">🏷️ Product Data Selectors — Where to Find Info on the Page</td></tr>
+    <tr>
+      <td>selectors.title</td>
+      <td>HTML location of the watch's name on the product page (tries multiple options as fallbacks)</td>
+    </tr>
+    <tr>
+      <td>selectors.price</td>
+      <td>HTML location of the price (e.g. <code>$550.00</code>)</td>
+    </tr>
+    <tr>
+      <td>selectors.sku</td>
+      <td>HTML location of the model code (e.g. <code>SRPL61</code>)</td>
+    </tr>
+    <tr>
+      <td>selectors.description</td>
+      <td>HTML location of the product description text</td>
+    </tr>
+    <tr>
+      <td>selectors.features</td>
+      <td>HTML location of the bullet-point feature list (water resistance, movement type, etc.)</td>
+    </tr>
+
+    <tr class="section-row"><td colspan="2">🖼️ Image Settings</td></tr>
+    <tr>
+      <td>image_extraction.method: dom</td>
+      <td>Find images by reading specific HTML elements on the page (as opposed to parsing JavaScript data)</td>
+    </tr>
+    <tr>
+      <td>image_extraction.dom_selectors</td>
+      <td>HTML elements that hold the image URLs (wrapper divs with <code>data-src</code> attribute)</td>
+    </tr>
+    <tr>
+      <td>image_extraction.exclude_keywords</td>
+      <td>Skip any image URLs containing these words — filters out small thumbnail sizes and mobile duplicates</td>
+    </tr>
+    <tr>
+      <td>image_download.referer</td>
+      <td>Pretend the image download request is coming from the Seiko website, to avoid being blocked</td>
+    </tr>
+
+    <tr class="section-row"><td colspan="2">📋 Spec Table — Technical Details in Product Description</td></tr>
+    <tr>
+      <td>spec_extraction.type: seiko_dual</td>
+      <td>Seiko pages have specs in two separate sections — the scraper knows to read both and combine them</td>
+    </tr>
+    <tr>
+      <td>spec_table.rows</td>
+      <td>Defines exactly which specs to include in the product description table and in what order (Brand, Model, Movement, Case Material, Diameter, etc.)</td>
+    </tr>
+    <tr>
+      <td>spec_table.rows[].type: static</td>
+      <td>Always use the same fixed value (e.g. Brand is always "Seiko")</td>
+    </tr>
+    <tr>
+      <td>spec_table.rows[].type: scraped</td>
+      <td>Use a value that was scraped from the page (e.g. the SKU)</td>
+    </tr>
+    <tr>
+      <td>spec_table.rows[].type: spec</td>
+      <td>Look up a specific spec by name from the scraped spec table (e.g. "Water Resistance")</td>
+    </tr>
+
+    <tr class="section-row"><td colspan="2">🛍️ Shopify Settings</td></tr>
+    <tr>
+      <td>shopify.vendor</td>
+      <td>The Vendor field in Shopify — shown to customers as the brand name ("Seiko")</td>
+    </tr>
+    <tr>
+      <td>shopify.product_type</td>
+      <td>The product category in Shopify ("Watch")</td>
+    </tr>
+    <tr>
+      <td>shopify.status_on_import</td>
+      <td>Products are imported as <strong>Draft</strong> — they are hidden from customers until you manually publish them</td>
+    </tr>
+    <tr>
+      <td>shopify.default_tags</td>
+      <td>Tags automatically added to every product: seiko, japanese-watch, watches</td>
+    </tr>
+    <tr>
+      <td>shopify.source_url_metafield</td>
+      <td>Which Shopify metafield stores the original Seiko website URL — this is how the deduplicator identifies already-imported products</td>
+    </tr>
+
+  </tbody>
+</table>
+</div>
+
+<footer>
+  Generated for the Shopify Pipeline &nbsp;·&nbsp; Brand: Seiko &nbsp;·&nbsp; Open directly in Chrome
+</footer>
+
+</body>
+</html>
