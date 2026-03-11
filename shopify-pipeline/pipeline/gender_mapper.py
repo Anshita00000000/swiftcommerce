@@ -4,18 +4,20 @@ gender_mapper.py
 Assigns a gender tag to each collected product URL by cross-referencing the
 master product list against per-gender collection results.
 
-This is Pass 3 of the URL collection pipeline.  It performs only pure dict
-operations — no page loads, no Selenium, no I/O.
+This is a pure utility module — no Selenium, no file I/O, no pipeline imports.
 
 Public API
 ----------
 assign_genders(master_entries, gender_collection_results, default_gender)
-    → (url_gender_map, diagnostics)
+    → {normalized_url: "Men"|"Women"|"Unisex"|""}
+
+get_unknown_urls(gender_map)
+    → [normalized_url, ...]   # all URLs with empty-string gender
 """
 
 import logging
 import re
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +30,7 @@ def assign_genders(
     master_entries: List[Dict],
     gender_collection_results: List[Dict],
     default_gender: str = "",
-) -> Tuple[Dict[str, str], Dict[str, List[str]]]:
+) -> Dict[str, str]:
     """
     Match every master entry against the per-gender collection results and
     assign each product a gender string.
@@ -43,38 +45,29 @@ def assign_genders(
     If it appears in both Men and Women collections      → "Unisex".
     If it appears in neither                            → default_gender (or "").
 
-    Additionally, if no gender_collection_results are provided at all, the
-    caller is responsible for applying any keyword-based fallback before using
-    the returned map.
+    When default_gender is "" and a URL has no match, a warning is logged.
 
     Args:
         master_entries:
-            Ordered list of dicts from Pass 1, each containing at minimum:
-              {url, normalized_url, code, availability}
+            Ordered list of dicts, each containing at minimum:
+              {url, normalized_url, code}
         gender_collection_results:
-            List of dicts from Pass 2, each:
+            List of dicts, each:
               {gender: "Men"|"Women", url: ..., pairs: [{url, code}, ...]}
         default_gender:
             Fallback gender string ("Men", "Women", "", …) used when a product
             is not found in any gender collection.
 
     Returns:
-        url_gender_map:
-            {normalized_url: "Men"|"Women"|"Unisex"|""}
-        diagnostics:
-            {
-              "unknown_gender":        [norm_url, ...],   # no match, no default
-              "missing_from_primary":  [norm_url, ...],   # in gender but not master
-            }
+        {normalized_url: "Men"|"Women"|"Unisex"|""} for every URL in
+        master_entries.
     """
     # ------------------------------------------------------------------
     # Build lookup structures from the gender collections
     # ------------------------------------------------------------------
-    # Per-gender sets of: normalized URLs, product slugs, product codes
     gender_url_sets:  Dict[str, Set[str]] = {}
     gender_slug_sets: Dict[str, Set[str]] = {}
     gender_code_sets: Dict[str, Set[str]] = {}
-    all_gender_norms: Set[str] = set()
 
     for gcr in gender_collection_results:
         gender = gcr["gender"]
@@ -85,7 +78,6 @@ def assign_genders(
         for pair in gcr["pairs"]:
             norm = _normalize_url(pair["url"])
             gender_url_sets[gender].add(norm)
-            all_gender_norms.add(norm)
 
             slug = _get_slug(norm)
             if slug:
@@ -95,19 +87,10 @@ def assign_genders(
             if code:
                 gender_code_sets[gender].add(code)
 
-    # Slug → normalized_url mapping from the master list (for missing check)
-    primary_by_slug: Dict[str, str] = {
-        _get_slug(e["normalized_url"]): e["normalized_url"]
-        for e in master_entries
-    }
-    master_slugs: Set[str] = {s for s in primary_by_slug if s}
-    master_norms: Set[str] = {e["normalized_url"] for e in master_entries}
-
     # ------------------------------------------------------------------
     # Assign gender to each master entry
     # ------------------------------------------------------------------
     url_gender_map: Dict[str, str] = {}
-    unknown_gender: List[str] = []
 
     for entry in master_entries:
         norm       = entry["normalized_url"]
@@ -132,31 +115,28 @@ def assign_genders(
         if not matched:
             url_gender_map[norm] = default_gender
             if not default_gender:
-                unknown_gender.append(norm)
+                logger.warning("No gender match for URL (no default): %s", norm)
         elif matched == {"Men"}:
             url_gender_map[norm] = "Men"
         elif matched == {"Women"}:
             url_gender_map[norm] = "Women"
         else:
-            # Found in more than one gender collection (or an unexpected value)
             url_gender_map[norm] = "Unisex"
 
-    # ------------------------------------------------------------------
-    # Detect gender-collection products not found in master
-    # ------------------------------------------------------------------
-    # Only flag a product as "missing from primary" if its slug is also absent
-    # from the master — avoids false positives caused by URL-path differences.
-    missing_from_primary: List[str] = [
-        u for u in all_gender_norms
-        if u not in master_norms and _get_slug(u) not in master_slugs
-    ]
+    return url_gender_map
 
-    diagnostics = {
-        "unknown_gender":       unknown_gender,
-        "missing_from_primary": missing_from_primary,
-    }
 
-    return url_gender_map, diagnostics
+def get_unknown_urls(gender_map: Dict[str, str]) -> List[str]:
+    """
+    Return all URLs from gender_map whose assigned gender is an empty string.
+
+    Args:
+        gender_map: The dict returned by assign_genders().
+
+    Returns:
+        List of normalized URLs with no gender assigned.
+    """
+    return [url for url, gender in gender_map.items() if gender == ""]
 
 
 def infer_gender_from_url(cat_url: str) -> str:
