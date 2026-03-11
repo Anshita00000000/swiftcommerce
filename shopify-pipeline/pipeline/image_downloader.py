@@ -1,8 +1,18 @@
 """
 image_downloader.py
-Downloads product images to outputs/{brand}/images/{handle}/.
-Re-run safe: skips already-downloaded images.
-Normalizes URLs to https:// before deduplication.
+
+Downloads product images for one product into the run's timestamped folder.
+
+Output path
+───────────
+  outputs/{brand}/listing/{timestamp}/images/{handle}/raw/
+
+Re-run safe: if the file already exists it is skipped without re-downloading.
+
+Public API
+──────────
+download_images(image_urls, handle, ctx, config) -> list[str]
+    Returns list of local file paths for successfully downloaded raw images.
 """
 
 import logging
@@ -29,42 +39,49 @@ HEADERS = {
 def download_images(
     image_urls: List[str],
     handle: str,
-    brand: str,
-    output_root: str = "outputs",
-    delay: float = 0.5,
+    ctx,
+    config: dict,
 ) -> List[str]:
     """
     Download a list of image URLs for one product.
 
     Args:
         image_urls: List of image URLs (already normalized to https://).
-        handle: Shopify product handle (used as folder name).
-        brand: Brand name (used in output path).
-        output_root: Base output directory.
-        delay: Seconds to wait between downloads.
+        handle:     Shopify product handle — used as the per-product folder name.
+        ctx:        RunContext instance; provides ctx.images_path(handle) for the
+                    output directory root.
+        config:     Adapted config dict; anti_bot.image_delay controls the
+                    per-download pause (falls back to anti_bot.page_delay, then 0.5s).
 
     Returns:
-        List of local file paths for successfully downloaded images.
+        List of local file paths for successfully downloaded raw images.
     """
     if not image_urls:
         return []
 
-    img_dir = Path(output_root) / brand / "images" / handle
-    img_dir.mkdir(parents=True, exist_ok=True)
+    anti_bot = config.get("anti_bot", {})
+    delay = float(
+        anti_bot.get("image_delay",
+        anti_bot.get("page_delay", 0.5))
+    )
 
-    local_paths = []
+    # Raw images live in a raw/ subfolder inside the per-handle image directory.
+    raw_dir: Path = ctx.images_path(handle) / "raw"
+    raw_dir.mkdir(parents=True, exist_ok=True)
+
+    local_paths: List[str] = []
 
     for i, url in enumerate(image_urls, 1):
         try:
-            filename = _url_to_filename(url, i)
-            local_path = img_dir / filename
+            filename   = _url_to_filename(url, i)
+            local_path = raw_dir / filename
 
             if local_path.exists():
-                logger.debug(f"  [img] Already exists, skipping: {filename}")
+                logger.debug("  [img] Already exists, skipping: %s", filename)
                 local_paths.append(str(local_path))
                 continue
 
-            logger.debug(f"  [img] Downloading {i}: {url}")
+            logger.debug("  [img] Downloading %d: %s", i, url)
             resp = requests.get(url, headers=HEADERS, timeout=30, stream=True)
             resp.raise_for_status()
 
@@ -73,33 +90,31 @@ def download_images(
                     f.write(chunk)
 
             local_paths.append(str(local_path))
-            logger.debug(f"  [img] Saved: {filename}")
+            logger.debug("  [img] Saved: %s", filename)
 
             if delay:
                 time.sleep(delay)
 
         except Exception as e:
-            logger.warning(f"  [img] Failed to download {url}: {e}")
+            logger.warning("  [img] Failed to download %s: %s", url, e)
 
     return local_paths
 
 
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
 def _url_to_filename(url: str, index: int) -> str:
     """
     Derive a safe filename from an image URL.
-    Falls back to '{index}.jpg' if the URL has no clear filename.
+    Falls back to 'image_{index:03d}.jpg' if the URL has no clear filename.
     """
     try:
-        parsed = urlparse(url)
-        basename = os.path.basename(parsed.path)
-        # Strip query strings that may have been included in the path
-        basename = basename.split("?")[0]
-        # Only keep the filename if it has a recognizable extension
+        parsed   = urlparse(url)
+        basename = os.path.basename(parsed.path).split("?")[0]
         if basename and "." in basename and len(basename) < 200:
-            # Sanitize
-            safe = "".join(c if c.isalnum() or c in "._-" else "_" for c in basename)
-            return safe
+            return "".join(c if c.isalnum() or c in "._-" else "_" for c in basename)
     except Exception:
         pass
-
     return f"image_{index:03d}.jpg"
