@@ -1,88 +1,149 @@
 """
 drafter.py
-DRAFTING mode: produces a CSV that sets removed products to Draft
-and adds the tag "swithommerce_PD" (sic — matching spec exactly).
+
+DRAFTING mode: reads links_to_draft.json produced by deduplicator.py,
+loads the full Shopify export CSV, filters to only the handles being
+drafted, modifies Status and Tags, and writes a ready-to-import CSV.
+
+The output file preserves the exact 86-column structure of the original
+Shopify export so it can be re-imported without any manual editing.
+
+Public API
+──────────
+build_draft_output(brand, ctx, shopify_exports_dir) -> str
+    Returns path to shopify_draft_copy.csv, or "" if nothing to draft.
 """
 
+import json
 import logging
 from pathlib import Path
-from typing import List
 
 import pandas as pd
 
-from pipeline.deduplicator import find_removed_products
-
 logger = logging.getLogger(__name__)
 
-DRAFT_TAG = "swithommerce_PD"
-
-# Columns Shopify needs to update existing products
-DRAFT_COLUMNS = [
-    "Handle",
-    "Title",
-    "Published",
-    "Tags",
-]
+DRAFT_TAG = "SwiftCommerce_PD"
 
 
-def build_draft_csv(
-    scraped_urls: List[str],
+# ---------------------------------------------------------------------------
+# Public entry point
+# ---------------------------------------------------------------------------
+
+def build_draft_output(
     brand: str,
-    output_root: str = "outputs",
+    ctx,
     shopify_exports_dir: str = "shopify_exports",
 ) -> str:
     """
-    Find products that no longer exist on the website and produce a CSV
-    that sets them to Draft + adds the tag "swithommerce_PD".
+    Produce a Shopify-importable CSV for products to be set to Draft.
 
     Args:
-        scraped_urls: All live URLs from the brand website.
-        brand: Brand name.
-        output_root: Base output directory.
-        shopify_exports_dir: Directory containing Shopify export CSVs.
+        brand:               Brand slug used to locate {brand}_shopify.csv.
+        ctx:                 RunContext; used for ctx.path() and logging.
+        shopify_exports_dir: Directory containing the Shopify export CSV files.
 
     Returns:
-        Path to the output CSV, or empty string if nothing to draft.
+        Absolute path to shopify_draft_copy.csv, or "" if nothing to draft.
     """
-    removed_df = find_removed_products(scraped_urls, brand, shopify_exports_dir)
-
-    if removed_df.empty:
-        logger.info("No products to draft — everything is still live.")
+    # ------------------------------------------------------------------
+    # Step 1 — Read links_to_draft.json
+    # ------------------------------------------------------------------
+    json_path = ctx.path("links_to_draft.json")
+    if not Path(json_path).exists():
+        logger.info("No products to draft (links_to_draft.json not found).")
         return ""
 
-    draft_rows = []
-    for _, row in removed_df.iterrows():
-        handle = str(row.get("Handle", "")).strip()
-        title = str(row.get("Title", "")).strip()
-        existing_tags = str(row.get("Tags", "")).strip()
+    with open(json_path, encoding="utf-8") as f:
+        data = json.load(f)
 
-        # Append DRAFT_TAG if not already present
-        tags = _add_tag(existing_tags, DRAFT_TAG)
+    products = data.get("products", [])
+    if not products:
+        logger.info("No products to draft.")
+        return ""
 
-        draft_rows.append({
-            "Handle": handle,
-            "Title": title,
-            "Published": "FALSE",
-            "Tags": tags,
-        })
+    handles_to_draft = {p["handle"] for p in products}
 
-    draft_df = pd.DataFrame(draft_rows, columns=DRAFT_COLUMNS)
+    # ------------------------------------------------------------------
+    # Step 2 — Load full Shopify export CSV
+    # ------------------------------------------------------------------
+    csv_path = Path(shopify_exports_dir) / f"{brand}_shopify.csv"
+    if not csv_path.exists():
+        logger.warning(
+            "Shopify export not found: %s. Cannot produce draft CSV.", csv_path
+        )
+        return ""
 
-    out_dir = Path(output_root) / brand
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / "draft_products.csv"
+    full_df = _load_csv(csv_path)
 
+    # ------------------------------------------------------------------
+    # Step 3 — Filter to only rows for handles being drafted
+    #          (ALL rows per handle, including image-only rows)
+    # ------------------------------------------------------------------
+    draft_df = full_df[full_df["Handle"].isin(handles_to_draft)].copy()
+
+    if draft_df.empty:
+        logger.warning(
+            "None of the handles from links_to_draft.json were found in "
+            "the Shopify export."
+        )
+        return ""
+
+    # ------------------------------------------------------------------
+    # Step 4 — Modify only Status and Tags
+    # ------------------------------------------------------------------
+    is_primary = (
+        draft_df["Title"].notna()
+        & (draft_df["Title"].astype(str).str.strip() != "")
+        & (draft_df["Title"].astype(str) != "nan")
+    )
+
+    # Status → "draft" for every row
+    draft_df["Status"] = "draft"
+
+    # Tags → append DRAFT_TAG only on primary (non-image) rows
+    if "Tags" in draft_df.columns:
+        draft_df.loc[is_primary, "Tags"] = draft_df.loc[is_primary, "Tags"].apply(
+            lambda t: _add_tag(str(t) if pd.notna(t) else "", DRAFT_TAG)
+        )
+    else:
+        draft_df.loc[is_primary, "Tags"] = DRAFT_TAG
+
+    # ------------------------------------------------------------------
+    # Step 5 — Write shopify_draft_copy.csv (all original columns)
+    # ------------------------------------------------------------------
+    out_path = ctx.path("shopify_draft_copy.csv")
     draft_df.to_csv(out_path, index=False, encoding="utf-8")
-    logger.info(f"Draft CSV written: {out_path} ({len(draft_rows)} products)")
+
+    # ------------------------------------------------------------------
+    # Step 6 — Log summary
+    # ------------------------------------------------------------------
+    n_handles = draft_df["Handle"].nunique()
+    n_rows    = len(draft_df)
+    logger.info(
+        "Draft CSV written: %d unique handles, %d total rows → %s",
+        n_handles, n_rows, out_path,
+    )
 
     return str(out_path)
 
 
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
 def _add_tag(existing_tags: str, new_tag: str) -> str:
-    """Add new_tag to existing comma-separated tags if not already present."""
-    if not existing_tags or existing_tags == "nan":
+    if not existing_tags or str(existing_tags).strip() in ("", "nan"):
         return new_tag
-    tags = [t.strip() for t in existing_tags.split(",") if t.strip()]
+    tags = [t.strip() for t in str(existing_tags).split(",") if t.strip()]
     if new_tag not in tags:
         tags.append(new_tag)
     return ", ".join(tags)
+
+
+def _load_csv(path: Path) -> pd.DataFrame:
+    for enc in ("utf-8", "utf-8-sig", "latin-1"):
+        try:
+            return pd.read_csv(path, encoding=enc, dtype=str, low_memory=False)
+        except UnicodeDecodeError:
+            continue
+    raise ValueError(f"Could not read CSV with any supported encoding: {path}")

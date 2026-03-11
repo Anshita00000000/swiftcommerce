@@ -116,7 +116,7 @@ def export_csv(products: List[Dict[str, Any]], output_path: str) -> None:
 
 def _product_to_rows(product: dict) -> List[Dict[str, str]]:
     handle     = product.get("handle", "")
-    images     = product.get("images", [])
+    images     = _resolve_images(product.get("images", []))
     title      = product.get("title", "")
     source_url = product.get("source_url", "")
 
@@ -126,7 +126,7 @@ def _product_to_rows(product: dict) -> List[Dict[str, str]]:
         "Title":                         title,
         "Body (HTML)":                   product.get("body_html", ""),
         "Vendor":                        product.get("vendor", ""),
-        "Product Category":              "",
+        "Product Category":              product.get("product_category", ""),
         "Type":                          product.get("type", ""),
         "Tags":                          product.get("tags", ""),
         "Published":                     "FALSE",
@@ -229,3 +229,24 @@ def _product_to_rows(product: dict) -> List[Dict[str, str]]:
         })
 
     return rows
+
+
+def _resolve_images(raw_images: list) -> list:
+    """
+    For each image path, prefer the processed webp file in the processed/
+    subfolder.  Fall back to the original path (or raw URL) when the
+    processed file doesn't exist — e.g. when --skip-images was used.
+    """
+    resolved = []
+    for img in raw_images:
+        img_str = str(img).strip()
+        if not img_str:
+            continue
+        if not img_str.startswith(("http://", "https://")):
+            p = Path(img_str)
+            processed = p.parent / "processed" / (p.stem + ".webp")
+            if processed.exists():
+                resolved.append(str(processed))
+                continue
+        resolved.append(img_str)
+    return resolved

@@ -1,159 +1,650 @@
 # =============================================================================
-# _template.yaml — Universal Shopify Scraping Pipeline Config Template
+# _template.yaml — Universal Canonical Config Template
+# =============================================================================
 # Copy this file to config/{brand}.yaml and fill in the values.
-# Zero Python changes needed when adding a new brand — only this YAML.
+# This template documents every field the pipeline supports across all brands.
+# No Python changes are needed when onboarding a new brand — only this YAML.
+#
+# CONVENTIONS:
+#   - Required fields have a plain value with no special qualifier.
+#   - Optional fields are marked:  # OPTIONAL
+#   - Allowed values for enum fields are listed as: options: a | b | c
+#   - Selector fields accept any valid CSS selector string.
+#   - List fields (marked "list for fallback") accept a YAML sequence; the
+#     pipeline tries each selector in order and returns the first non-empty hit.
 # =============================================================================
 
-# Brand display name (used as Shopify Vendor field)
-brand_name: "Brand Name"
 
-# Base URL of the brand website (used to resolve relative URLs)
+# =============================================================================
+# SECTION 1 — IDENTITY
+# =============================================================================
+
+# Internal brand slug used in file paths, log messages, and output directories.
+# Use lowercase letters and hyphens only (e.g. "hamilton", "wolf1834").
+brand: "brand-slug"
+
+# Human-readable brand name exactly as it should appear in Shopify
+# (Vendor column, spec table, default tags, etc.).
+display_name: "Brand Display Name"
+
+# Root URL of the brand website. Used to resolve product links and image URLs
+# that start with "/" or "//" (protocol-relative).
 base_url: "https://www.example.com"
 
-# =============================================================================
-# Category pages to collect product URLs from
-# =============================================================================
-category_urls:
-  - "https://www.example.com/collections/watches"
-  - "https://www.example.com/collections/accessories"
 
 # =============================================================================
-# Pagination configuration
+# SECTION 2 — URL COLLECTION
 # =============================================================================
-pagination:
-  # Type options: next_button | load_more | infinite_scroll | none
-  type: next_button
+# Controls how the pipeline discovers product URLs across the site.
+#
+# Two-pass strategy:
+#   Pass 1 — primary_url builds the authoritative master list of all product URLs.
+#   Pass 2 — each gender_url is scraped independently and its results are
+#             cross-referenced against the master list to assign a gender tag.
+#             Products in gender_urls are NOT double-imported; they are tagged only.
 
-  # For next_button:
-  next_button_selector: "a.next-page"
-  max_pages: 100
+url_collection:
 
-  # For load_more:
-  # load_more_selector: "button.load-more"
-  # max_clicks: 50
+  # URL of a collection page that lists ALL products (e.g. "all watches").
+  # This is the authoritative source for the master product URL list.
+  # Leave blank ("") only when gender_urls should serve as the sole source.
+  primary_url: "https://www.example.com/collections/all"
 
-  # For infinite_scroll:
-  # max_scrolls: 50
-  # scroll_pause: 2  # seconds to wait after each scroll
+  # Pagination settings for the primary_url page.
+  # Uses the same schema as every other pagination block — see the
+  # PAGINATION BLOCK SCHEMA note below for the full field reference.
+  primary_pagination:
+    # Pagination strategy for this page.
+    # options: infinite_scroll | next_button | load_more | url_param | none
+    type: infinite_scroll
+
+    # Seconds to wait after each scroll step before measuring page height again.
+    # [used by: infinite_scroll]
+    scroll_pause: 3
+
+    # Maximum number of scroll attempts before stopping, regardless of whether
+    # the page has stopped growing. Prevents infinite loops.
+    # [used by: infinite_scroll]
+    max_scrolls: 60
+
+    # CSS selector for the "next page" link or button.
+    # [used by: next_button]
+    next_button_selector: "a.pagination__next"
+
+    # CSS selector for the "load more" button.
+    # [used by: load_more]
+    load_more_selector: "button.load-more"
+
+    # Maximum number of pages to visit before stopping.
+    # [used by: next_button | url_param]
+    max_pages: 50
+
+    # Python .format() template for the page number query param or path segment.
+    # {} is replaced with the current page number (starting at 1).
+    # Examples: "?page={}"  |  "/page/{}"  |  "?start={}"
+    # [used by: url_param]
+    param_template: "?page={}"
+
+  # ---------------------------------------------------------------------------
+  # Gender URLs (Pass 2)
+  # ---------------------------------------------------------------------------
+  # List of collection pages segmented by gender. Each entry is independently
+  # paginated and scraped. Products found in a gender URL receive that gender
+  # tag in the Shopify Tags column (see shopify.gender_tags below).
+  # Products present in primary_url but absent from all gender_urls receive
+  # an empty gender value (treated as Unisex downstream).
+  gender_urls:
+    - # Full URL of the gender-specific collection page.
+      url: "https://www.example.com/collections/mens"
+
+      # Gender label assigned to every product found in this collection.
+      # options: "Men" | "Women"
+      gender: "Men"
+
+      # Pagination block for this gender URL. Same schema as primary_pagination.
+      pagination:
+        type: infinite_scroll
+        scroll_pause: 3
+        max_scrolls: 40
+        next_button_selector: ""   # leave blank if not used by this type
+        load_more_selector: ""     # leave blank if not used by this type
+        max_pages: 50
+        param_template: "?page={}"
+
+    - url: "https://www.example.com/collections/womens"
+      gender: "Women"
+      pagination:
+        type: infinite_scroll
+        scroll_pause: 3
+        max_scrolls: 40
+        next_button_selector: ""
+        load_more_selector: ""
+        max_pages: 50
+        param_template: "?page={}"
+
+  # CSS selector matching the <a> elements that link to individual product pages
+  # on any collection / listing page.
+  product_link_selector: "a.product-card__title"
+
+  # ---------------------------------------------------------------------------
+  # Code extraction
+  # ---------------------------------------------------------------------------
+  # Extracts a short product reference code (e.g. "H32515555") at URL-collection
+  # time. Stored in the master catalog and used for deduplication and inventory.
+  code_extraction:
+    # Where to obtain the code.
+    # options:
+    #   "attribute" — read an HTML attribute on or near the product link element.
+    #                 The pipeline walks up to 5 ancestor levels from the <a> tag
+    #                 to find an ancestor that carries the attribute.
+    #   "url"       — parse the code out of the product's href value.
+    source: "attribute"
+
+    # Name of the HTML attribute that carries the product code.
+    # [used by: source = "attribute"]
+    attribute: "data-product-sku"
+
+    # Case normalization applied to the raw extracted value.
+    # options: "uppercase" | "lowercase" | "" (no transformation)
+    normalize: "uppercase"
+
+  # ---------------------------------------------------------------------------
+  # Listing availability  # OPTIONAL — best-effort, does not affect import
+  # ---------------------------------------------------------------------------
+  # Some listing pages mark products as sold-out directly on the collection card
+  # (e.g. a badge overlay). When configured, this flag is recorded on the raw
+  # product record in products_raw.json for reference purposes ONLY.
+  # It does NOT prevent a product from being scraped or imported.
+  listing_availability:
+    # CSS selector for the element that signals availability on a listing card.
+    selector: ".product-card__badge--sold-out"
+
+    # What the *presence* of that element means.
+    # options:
+    #   "sold_out"  — element is present when the product is sold out
+    #   "available" — element is present when the product is in stock
+    present_means: "sold_out"
+
 
 # =============================================================================
-# CSS selectors
+# SECTION 3 — DRIVER
 # =============================================================================
+# Selenium / ChromeDriver timing settings.
+
+driver:
+  # Seconds to wait after the very first page load in a session. The browser
+  # may need extra time to clear bot-detection checks on the initial request.
+  first_load_wait: 15
+
+  # Seconds to wait after each subsequent page load before parsing the DOM.
+  # Also used to derive the Selenium page_load_timeout (value × 6, minimum 60s).
+  page_load_wait: 5
+
+
+# =============================================================================
+# SECTION 4 — ANTI-BOT
+# =============================================================================
+# Timing and behavioral settings that reduce the risk of detection.
+
+anti_bot:
+  # Minimum seconds to wait between page requests.
+  # The actual delay is chosen at random from [random_delay_min, random_delay_max].
+  random_delay_min: 3
+
+  # Maximum seconds to wait between page requests.
+  random_delay_max: 7
+
+  # When true, the scraper scrolls down the product page slowly in small
+  # increments before extracting data. Use this for sites that lazy-load
+  # spec sections or images only when they scroll into the viewport.
+  slow_scroll: false
+
+  # Seconds to pause between each incremental scroll step when slow_scroll
+  # is true. Smaller values scroll faster; 0.3–1.0 is typical.
+  scroll_pause: 0.3
+
+
+# =============================================================================
+# SECTION 5 — PRE-SCRAPE ACTIONS
+# =============================================================================
+# Browser actions executed on each product page BEFORE data extraction begins.
+# Use these to expand collapsed accordions, dismiss cookie banners, or trigger
+# any interaction needed to reveal hidden spec content.
+#
+# Each action supports:
+#   type       — what kind of action to perform (see options below)
+#   selector   — CSS selector for the target element(s)
+#   wait_after — OPTIONAL: seconds to sleep after the action completes
+
+pre_scrape_actions:
+  # js_click_all: find every element matching selector and JavaScript-click each.
+  # Safer than Selenium .click() for off-screen or partially hidden elements.
+  - type: js_click_all
+    selector: ".accordion__title.collapsed"
+    wait_after: 0.8   # OPTIONAL — defaults to 0 if omitted
+
+  # click: standard Selenium click on the first element matching selector.
+  # - type: click
+  #   selector: "button.accept-cookies"
+  #   wait_after: 0.5   # OPTIONAL
+
+  # wait: pause for wait_after seconds without interacting with any element.
+  # Useful after a navigation event or animation completes.
+  # - type: wait
+  #   selector: ""       # ignored for wait actions
+  #   wait_after: 2
+
+
+# =============================================================================
+# SECTION 6 — SELECTORS
+# =============================================================================
+# CSS selectors for text fields scraped from each product detail page.
+# Every field is a list to support fallback: selectors are tried in order
+# and the pipeline returns the text of the first element that matches and
+# is non-empty. Use a single-item list if no fallback is needed.
+
 selectors:
-  # Selector for product links on category pages
-  product_link: "a.product-item__title"
 
-  # Optional: features list items (for features_list spec row type)
-  features_list: "ul.product-features li"
+  # Product title — written to the Shopify "Title" column.
+  title:
+    - "h1.product__title"
+    - "h1.product-name"
+    - "h1"
+
+  # Sale / display price — written to the Shopify "Variant Price" column.
+  # The pipeline strips currency symbols and thousand-separators automatically.
+  price:
+    - "span.price__current"
+    - ".product-price .amount"
+    - ".price-box .price"
+
+  # SKU / reference number — written to the Shopify "Variant SKU" column.
+  sku:
+    - ".product__sku-value"
+    - "[data-product-sku]"
+    - ".product-reference"
+
+  # OPTIONAL — strip a static prefix from the raw SKU value before storing.
+  # Example: sku_prefix_to_strip: "Ref. " turns "Ref. H32515555" → "H32515555"
+  sku_prefix_to_strip: ""
+
+  # Long-form product description — inserted into the Shopify body HTML above
+  # the spec table.
+  description:
+    - ".product__description"
+    - "#product-description .value"
+    - ".product-info__description"
+
+  # Bullet-point feature list — the selector must target individual <li> elements
+  # directly. Each matched <li> text becomes a list item in the body HTML and
+  # the spec table's Features row.
+  features:
+    - ".product-features__list li"
+    - ".product__description li"
+
+  # Currently selected color / material variant label.  # OPTIONAL
+  color:
+    - ".swatch-attribute__selected-option"
+    - ".variant-color-label"
+
+  # Currently selected size variant label.  # OPTIONAL
+  size:
+    - ".product-size__value"
+    - ".variant-size-label"
+
 
 # =============================================================================
-# Per-page field selectors (text extraction)
-# Each key becomes a field in the raw product dict.
+# SECTION 7 — PRODUCT AVAILABILITY
 # =============================================================================
-fields:
-  title: "h1.product__title"
-  price: "span.price__current"
-  description: "div.product__description"
-  sku: "span.product__sku"
+# OPTIONAL — best-effort, recorded in products_raw.json ONLY.
+# Captures the availability status shown on the product detail page.
+# This information is stored for reference but applies NO filtering logic —
+# every collected product URL is scraped and imported regardless of stock status.
+
+product_availability:
+  # CSS selector for the availability indicator element on the product page.
+  selector: ".product__availability-badge"
+
+  # Text content (or partial text) indicating the product IS available.
+  # Matching is case-insensitive.
+  available_text: "In Stock"
+
+  # Text content (or partial text) indicating the product is sold out.
+  # Matching is case-insensitive.
+  sold_out_text: "Sold Out"
+
 
 # =============================================================================
-# Image extraction
+# SECTION 8 — SPEC EXTRACTION
 # =============================================================================
-images:
-  # method: dom_selector | magento_json
-  method: dom_selector
+# Extracts structured key→value specification pairs from the product page.
+# The pairs are stored in the "specs" dict on each raw product record and
+# are later used to populate the spec_table HTML and Shopify metafields.
+#
+# Set `type` to one of the six supported strategies, then supply only the
+# sub-fields listed under that strategy. All other sub-fields are ignored.
 
-  # --- DOM selector method ---
-  selector: "div.product__media img"
-  attr: "src"
-  fallback_attr: "data-src"
+spec_extraction:
 
-  # --- Magento JSON method ---
-  # method: magento_json
-  # script_contains: "mage/gallery/gallery"   # substring to identify the right <script>
-  # script_pattern: '"url":"(https?://[^"]+)"' # regex to extract image URLs
+  # Extraction strategy.
+  # options: seiko_dual | row | label_value | aria_label | accordion | icon_map
+  type: row
 
-# =============================================================================
-# Spec table extraction from the product page
-# =============================================================================
-spec_table:
-  # CSS selector for each spec row (e.g., a <tr> or <li>)
+  # ---------------------------------------------------------------------------
+  # type: seiko_dual
+  # ---------------------------------------------------------------------------
+  # Hardcoded logic for Seiko USA's two-section product page layout.
+  # Section 1 — .feature-item blocks:
+  #   <div class="feature-item">
+  #     <div class="feature-label">Case Material</div>
+  #     <div class="feature-value">Stainless steel</div>
+  #   </div>
+  # Section 2 — .techdata-grid sibling div pairs (.label + .value).
+  # No extra fields are required; the selectors are fully baked into the code.
+  # (No additional fields needed for seiko_dual — just set type: seiko_dual)
+
+  # ---------------------------------------------------------------------------
+  # type: row
+  # ---------------------------------------------------------------------------
+  # Generic row-based extraction. Each row element contains both a key element
+  # and a value element nested inside it. Works for standard HTML tables
+  # (<tr>/<td>) and definition lists (<dl>/<dt>/<dd>), or any similar structure.
+
+  # CSS selector for each row container (e.g. a <tr> or <li>).
   row_selector: "table.product-specs tr"
-  # Within each row, selector for the key cell
+
+  # CSS selector for the key cell, evaluated within each matched row.
   key_selector: "td:first-child"
-  # Within each row, selector for the value cell
+
+  # CSS selector for the value cell, evaluated within each matched row.
   value_selector: "td:last-child"
 
-  # Optional: extract specs from elements with aria-label attributes
-  # aria_label_selector: "span[aria-label]"
+  # ---------------------------------------------------------------------------
+  # type: label_value
+  # ---------------------------------------------------------------------------
+  # For sites like Hamilton where all label elements and all value elements are
+  # siblings in the DOM rather than being nested inside shared row containers.
+  # The pipeline zips labels and values by their DOM order.
 
-  # Rows to include in the HTML spec table output.
-  # Types: static | scraped | label_value | aria_label | features_list
+  # CSS selector that matches ALL spec label elements on the page.
+  # [used by: label_value]
+  label_selector: ".attribute-label"
+
+  # CSS selector that matches ALL spec value elements on the page (parallel list).
+  # [used by: label_value]
+  # value_selector is shared with "row" — set it here for label_value too:
+  # value_selector: ".attribute-value"
+
+  # ---------------------------------------------------------------------------
+  # type: aria_label
+  # ---------------------------------------------------------------------------
+  # For sites like Tissot where the aria-label attribute on each element carries
+  # both the key and value as a single concatenated string (e.g. aria-label=
+  # "Case Material Stainless steel"). Known keys are stripped from the front to
+  # isolate the value portion.
+
+  # CSS selector for elements whose aria-label attribute holds "KEY VALUE".
+  # [used by: aria_label]
+  # row_selector is shared with "row" — set it here for aria_label too.
+
+  # Name of the attribute that carries the "KEY VALUE" string.
+  # [used by: aria_label]
+  label_attr: "aria-label"
+
+  # Ordered list of spec key strings to recognize. The pipeline tests whether
+  # each aria-label value starts with one of these strings (case-insensitive).
+  # [used by: aria_label]
+  known_keys:
+    - "Case Material"
+    - "Crystal"
+    - "Water Resistance"
+    - "Case Diameter"
+    - "Movement"
+    - "Functions"
+
+  # ---------------------------------------------------------------------------
+  # type: accordion
+  # ---------------------------------------------------------------------------
+  # Generic accordion / expandable-section extraction. Works for both
+  # Movado-style and Rado-style accordion layouts. Each accordion item has a
+  # clickable label panel and an expandable content panel.
+  # Note: pair this with a pre_scrape_actions js_click_all entry to expand
+  # all accordion sections before the DOM is parsed.
+
+  # CSS selector for each independent accordion entry (the wrapper element).
+  # [used by: accordion]
+  item_selector: ".accordion__item"
+
+  # CSS selector for the label / title element within each accordion item.
+  # [used by: accordion]  (also shared with label_value — provide value here)
+  # label_selector: ".accordion__title"
+
+  # CSS selector for the content / value element within each accordion item.
+  # [used by: accordion]  (also shared with row / label_value)
+  # value_selector: ".accordion__content"
+
+  # ---------------------------------------------------------------------------
+  # type: icon_map
+  # ---------------------------------------------------------------------------
+  # For icon-based spec grids like Luminox, where each spec is represented by
+  # an icon image and a short text label. The icon's src or class is mapped to
+  # a human-readable spec key via icon_label_map.
+
+  # CSS selector for each icon-spec container element.
+  # [used by: icon_map]
+  icon_item_selector: ".spec-icon-item"
+
+  # CSS selector for the text label element within each icon-spec container.
+  # [used by: icon_map]
+  text_selector: ".spec-icon-label"
+
+  # CSS selector for the icon element (typically an <img>) within each container.
+  # [used by: icon_map]
+  icon_selector: ".spec-icon img"
+
+  # HTML attribute on the icon element used to identify which spec it represents.
+  # Common values: "src" (image URL fragment) | "class" | "data-icon"
+  # [used by: icon_map]
+  icon_attribute: "src"
+
+  # Mapping from icon identifier fragment → human-readable spec key name.
+  # The pipeline checks whether icon_attribute value *contains* each map key
+  # (case-insensitive substring match).
+  # [used by: icon_map]
+  icon_label_map:
+    "water-resistance": "Water Resistance"
+    "case-material":    "Case Material"
+    "movement":         "Movement"
+    "crystal":          "Crystal"
+    "strap":            "Strap"
+    "warranty":         "Warranty"
+
+
+# =============================================================================
+# SECTION 9 — SPEC TABLE
+# =============================================================================
+# Defines the HTML specification table injected into the Shopify product body.
+# The pipeline renders this as a styled <table> placed after the description.
+
+spec_table:
+  # Heading text displayed above the rendered spec table.
+  header: "Item Specification"
+
+  # Ordered list of rows to include in the spec table.
+  # Each row must have a "label" (left column) and a "type" that controls
+  # where the right-column value comes from.
+  #
+  # Row types and their required extra fields:
+  #
+  #   static  — a hard-coded constant that never varies per product.
+  #             Extra field:  value  (string)
+  #
+  #   scraped — pulls a value from the product's top-level scraped fields:
+  #             title, price, sku, description, color, size, or features.
+  #             Extra field:  field  (string — must match a scraped field name)
+  #
+  #   spec    — looks up a key in the specs dict produced by spec_extraction.
+  #             Matching is case-insensitive.
+  #             Extra field:  spec_key  (string)
+
   rows:
-    - type: static
-      label: "Brand"
-      value: "Brand Name"
+    # Brand name — always static; never varies per product.
+    - label: "Brand"
+      type: static
+      value: "Brand Display Name"
 
-    - type: scraped
-      label: "Reference"
-      field: "sku"
+    # Reference / SKU number pulled from the scraped sku field.
+    - label: "Reference"
+      type: scraped
+      field: sku
 
-    - type: label_value
-      # Omit 'keys' to include ALL scraped spec key/value pairs.
-      # Or list specific keys to filter:
-      keys:
-        - "Case Material"
-        - "Dial Color"
-        - "Water Resistance"
+    # Remaining rows source their values from extracted spec key/value pairs.
+    - label: "Movement"
+      type: spec
+      spec_key: "Movement"
 
-    # - type: features_list
-    #   label: "Features"
+    - label: "Case Material"
+      type: spec
+      spec_key: "Case Material"
+
+    - label: "Case Diameter"
+      type: spec
+      spec_key: "Case Diameter"
+
+    - label: "Case Thickness"
+      type: spec
+      spec_key: "Case Thickness"
+
+    - label: "Dial Color"
+      type: spec
+      spec_key: "Dial Color"
+
+    - label: "Crystal"
+      type: spec
+      spec_key: "Crystal"
+
+    - label: "Strap / Bracelet"
+      type: spec
+      spec_key: "Strap"
+
+    - label: "Clasp"
+      type: spec
+      spec_key: "Clasp"
+
+    - label: "Water Resistance"
+      type: spec
+      spec_key: "Water Resistance"
+
+    - label: "Functions"
+      type: spec
+      spec_key: "Functions"
+
+    # Description placed at the bottom of the spec table.
+    - label: "Description"
+      type: scraped
+      field: description
+
 
 # =============================================================================
-# Shopify field mappings
+# SECTION 10 — IMAGE EXTRACTION
 # =============================================================================
-shopify_mapping:
-  vendor:
-    value: "Brand Name"   # constant string
+# Controls how product images are discovered on each product detail page.
 
-  type:
-    value: "Watches"      # constant, or use {source: "field_name"} to pull from scraped data
+image_extraction:
+  # Strategy for locating image URLs.
+  # options:
+  #   dom_selector  — walk the DOM with CSS selectors (works on most platforms)
+  #   magento_json  — parse a <script> block containing a JSON image gallery
+  #                   (Magento 2 stores typically embed all images this way)
+  #   both          — run magento_json first; fall back to dom_selector if no
+  #                   images are found via the JSON approach
+  method: dom_selector
 
-  title:
-    source: "title"       # scraped field name
+  # List of CSS selectors tried in order to locate image elements.
+  # The first selector that returns at least one URL wins.
+  # [used by: dom_selector | both]
+  dom_selectors:
+    - ".product__media img"
+    - ".product-gallery__image"
+    - ".fotorama__stage__frame img"
 
-  description:
-    source: "description"
+  # HTML attribute on the matched element that holds the image URL.
+  # Common values: "src" | "data-src" | "href"
+  # [used by: dom_selector | both]
+  dom_attribute: src
 
-  price:
-    source: "price"
+  # OPTIONAL — fallback attribute tried when dom_attribute is empty or missing
+  # on a given element. Handles lazy-loaded images that populate data-src
+  # before the real src is set.
+  # [used by: dom_selector | both]
+  fallback_attr: "data-src"
 
-  sku:
-    source: "sku"
+  # OPTIONAL — list of substrings; any image URL containing one of these strings
+  # (case-insensitive) is discarded. Use to filter out thumbnails, swatches,
+  # placeholder graphics, or low-resolution variants.
+  exclude_keywords:
+    - "thumbnail"
+    - "thumb"
+    - "_small"
+    - "placeholder"
+    - "swatch"
+    - "60x60"
+    - "150x150"
 
-  published: "TRUE"       # TRUE or FALSE
+  # OPTIONAL — when true, the query string (everything after "?") is stripped
+  # from each image URL before deduplication. Useful when the same image appears
+  # with different cache-busting or resize parameters appended.
+  strip_query_params: false
 
-  tags:
-    static:               # always-added tags
-      - "watches"
-      - "new-arrivals"
-    # source: "category"  # optionally pull a tag from a scraped field
+  # Substring that must appear inside a <script> block for it to be treated as
+  # a Magento image gallery script. Prevents false positives from unrelated scripts.
+  # [used by: magento_json | both]
+  script_contains: "mage/gallery/gallery"
+
+  # Python regex applied to the matched script text. Each capture group (the
+  # part inside parentheses) is extracted as an image URL.
+  # [used by: magento_json | both]
+  script_pattern: '"url":"(https?://[^"]+)"'
+
 
 # =============================================================================
-# Anti-bot / timing settings
+# SECTION 11 — SHOPIFY
 # =============================================================================
-anti_bot:
-  # Seconds to wait after page load before scraping
-  page_delay: 2
+# Values written into Shopify CSV columns and the Tags field.
 
-  # Seconds to wait between image downloads
-  image_delay: 0.3
+shopify:
+  # Value for the Shopify "Vendor" column. Typically the brand display name.
+  vendor: "Brand Display Name"
 
-  # Browser window size [width, height]
-  window_size: [1400, 900]
+  # Value for the Shopify "Type" column (e.g. "Watch", "Watch Winder").
+  product_type: "Watch"
 
-  # Page load timeout in seconds
-  page_load_timeout: 60
+  # Value for the Shopify "Product Category" column.
+  # Use Shopify's standard taxonomy path string.
+  product_category: "Apparel & Accessories > Jewelry > Watches"
 
-  # Optional: custom User-Agent string
-  # user_agent: "Mozilla/5.0 ..."
+  # Status assigned to the product in Shopify when it is first imported.
+  # options: draft | active
+  # Use "draft" so products can be reviewed before going live.
+  status_on_import: draft
+
+  # Tags always added to every product from this brand, regardless of gender.
+  # Written to the Shopify "Tags" column, comma-separated.
+  default_tags:
+    - "brand-slug"
+    - "watches"
+    - "luxury"
+
+  # Gender-specific tags appended to the Tags column based on which gender
+  # collection the product was found in during URL collection (Pass 2).
+  # Set a value to "" to add no extra tag for that gender.
+  gender_tags:
+    # Tag string added when the product was found in a gender_url with gender: "Men".
+    mens: "mens-watches"
+
+    # Tag string added when the product was found in a gender_url with gender: "Women".
+    womens: "womens-watches"
+
+    # Tag string added when the product appeared only in the primary_url and
+    # was NOT matched to any gender collection (treated as Unisex).
+    unisex: "unisex-watches"
