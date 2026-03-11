@@ -19,18 +19,18 @@ def normalize_products(
     config: dict,
     image_map: Dict[str, List[str]],
     brand: str,
-    url_gender_map: Optional[Dict[str, str]] = None,
+    url_data_map: Optional[Dict[str, Any]] = None,
 ) -> List[Dict[str, Any]]:
     shopify_mapping = config.get("shopify_mapping", {})
     footer_html = _load_footer()
     normalized = []
-    if url_gender_map is None:
-        url_gender_map = {}
+    if url_data_map is None:
+        url_data_map = {}
 
     for raw in raw_products:
         try:
             product = _normalize_one(
-                raw, config, shopify_mapping, image_map, footer_html, brand, url_gender_map
+                raw, config, shopify_mapping, image_map, footer_html, brand, url_data_map
             )
             normalized.append(product)
         except Exception as e:
@@ -39,7 +39,7 @@ def normalize_products(
     return normalized
 
 
-def _normalize_one(raw, config, shopify_mapping, image_map, footer_html, brand, url_gender_map):
+def _normalize_one(raw, config, shopify_mapping, image_map, footer_html, brand, url_data_map):
     source_url = raw.get("source_url", "")
 
     # Canonical product URL — strip /collections/xxx/ prefix if present
@@ -60,7 +60,7 @@ def _normalize_one(raw, config, shopify_mapping, image_map, footer_html, brand, 
 
     # --- Gender (collection-based) ---
     norm_url = _normalize_url(source_url)
-    gender         = url_gender_map.get(norm_url, "")
+    gender         = url_data_map.get(norm_url, {}).get("gender", "")
     gender_shopify = _gender_to_shopify(gender)
 
     # --- Specs extraction ---
@@ -91,7 +91,27 @@ def _normalize_one(raw, config, shopify_mapping, image_map, footer_html, brand, 
     tags_cfg = shopify_mapping.get("tags", config.get("default_tags", []))
     tags = _resolve_tags(raw, tags_cfg)
 
+    # --- Gender tags ---
+    gender_tags = shopify_mapping.get("gender_tags", {})
+    if gender == "Men":
+        gt = gender_tags.get("mens", "")
+        if gt:
+            tags = f"{tags}, {gt}" if tags else gt
+    elif gender == "Women":
+        gt = gender_tags.get("womens", "")
+        if gt:
+            tags = f"{tags}, {gt}" if tags else gt
+    elif gender == "Unisex":
+        gt = gender_tags.get("unisex", [])
+        if isinstance(gt, list):
+            for item in gt:
+                if item:
+                    tags = f"{tags}, {item}" if tags else item
+        elif gt:
+            tags = f"{tags}, {gt}" if tags else gt
+
     product_type = _resolve_mapping(raw, shopify_mapping.get("type", {})) or "Watch"
+    product_category = config.get("shopify_mapping", {}).get("product_category", "")
 
     return {
         # Core
@@ -100,6 +120,7 @@ def _normalize_one(raw, config, shopify_mapping, image_map, footer_html, brand, 
         "body_html":     body_html,
         "vendor":        brand_name,
         "type":          product_type,
+        "product_category": product_category,
         "tags":          tags,
         "published":     "FALSE",
         "option1_name":  "Title",
@@ -223,6 +244,12 @@ def _build_spec_table(raw: dict, config: dict) -> str:
             elif row_type == "scraped":
                 field = row.get("field", "")
                 value = raw.get(field, "")
+                if label and value:
+                    rows_html.append(_table_row(label, value))
+
+            elif row_type == "spec_accordion":
+                spec_key = row.get("spec_key") or label
+                value = specs.get(spec_key, "") or _lookup_spec_ci(specs, spec_key)
                 if label and value:
                     rows_html.append(_table_row(label, value))
 
