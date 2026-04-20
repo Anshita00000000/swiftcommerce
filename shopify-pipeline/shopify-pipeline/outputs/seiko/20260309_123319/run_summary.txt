@@ -1,0 +1,23 @@
+brand: seiko
+mode: listing
+timestamp: 20260309_123319
+
+=== Counts ===
+urls_collected: 3
+new_urls: 3
+products_scraped: 3
+products_exported: 3
+images_downloaded: 15
+catalog_total: 3
+catalog_new: 3
+catalog_updated: 0
+
+=== Events ===
+[2026-03-09 12:34:51] Collected 3 product URLs
+[2026-03-09 12:34:51] Found 3 new URLs after deduplication
+[2026-03-09 12:35:33] Scraped 3 products
+[2026-03-09 12:35:34] Downloaded 15 images
+[2026-03-09 12:35:34] Exported 3 products to CSV
+[2026-03-09 12:35:34] Inventory updated: total=3, new=3, updated=0
+
+runtime_seconds: 134.89

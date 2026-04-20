@@ -1,0 +1,9 @@
+selenium
+undetected-chromedriver
+webdriver-manager
+pyyaml
+requests
+beautifulsoup4
+pandas
+python-slugify
+lxml

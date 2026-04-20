@@ -1,0 +1,164 @@
+{
+  "meta": {
+    "brand": "Movado",
+    "timestamp": "20260311_193522",
+    "total_urls": 25,
+    "with_sku": 0,
+    "men": 10,
+    "women": 5,
+    "unisex": 8,
+    "unknown_gender": 2
+  },
+  "urls": [
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/museum-bangle-0608072.html",
+      "sku": "",
+      "gender": "Unisex",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/heritage-1917-3650247.html",
+      "sku": "",
+      "gender": "Unisex",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/heritage-1917-3650253.html",
+      "sku": "",
+      "gender": "Unisex",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/bold-evolution-2.0-chronograph-3601265.html",
+      "sku": "",
+      "gender": "Unisex",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/heritage-1917-3650249.html",
+      "sku": "",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/heritage-1917-3650257.html",
+      "sku": "",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/museum-classic-chronograph-0607777.html",
+      "sku": "",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/museum-imperiale-0608048.html",
+      "sku": "",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/museum-imperiale-0608054.html",
+      "sku": "",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/bold-fusion-chronograph-3601240.html",
+      "sku": "",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/heritage-calendoplan-s-chronograph-3650126.html",
+      "sku": "",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/bold-quest-mini-3601294.html",
+      "sku": "",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/heritage-1917-3650246.html",
+      "sku": "",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/face-3640155.html",
+      "sku": "",
+      "gender": "Unisex",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/series-800-chronograph-2600194.html",
+      "sku": "",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/heritage-calendoplan-chronograph-3650148.html",
+      "sku": "",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/bold-verso-chronograph-3600907.html",
+      "sku": "",
+      "gender": "Unisex",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/face-3640140.html",
+      "sku": "",
+      "gender": "Unisex",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/bold-evolution-2.0-3601300.html",
+      "sku": "",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/bold-tr90-3601417.html",
+      "sku": "",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/face-3640112.html",
+      "sku": "",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/bold-fusion-chronograph-3601307.html",
+      "sku": "",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/1881-automatic-0607620.html",
+      "sku": "",
+      "gender": "Unisex",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/bold-verso-chronograph-3600867.html",
+      "sku": "",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://www.movado.com/us/en/shop-watches/face-3640113.html",
+      "sku": "",
+      "gender": "Women",
+      "availability": ""
+    }
+  ]
+}

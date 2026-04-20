@@ -1,0 +1,176 @@
+# ============================================================
+# SEIKO USA — BRAND CONFIG
+# Verified against: https://seikousa.com/collections/all/products/srpl61
+# Platform: Shopify (custom BLS theme)
+# NOTE: This is seikousa.com — different from seikowatches.com
+# ============================================================
+
+brand: seiko
+display_name: "Seiko"
+base_url: https://seikousa.com
+
+url_collection:
+  type: category_scrape
+
+  primary_url: "https://seikousa.com/collections/all"
+  primary_pagination:
+    type: scroll
+    scroll_pause: 3
+    max_scrolls: 60
+
+  gender_urls:
+    - url: "https://seikousa.com/collections/mens"
+      gender: "Men"
+      pagination:
+        type: scroll
+        scroll_pause: 3
+        max_scrolls: 60
+    - url: "https://seikousa.com/collections/womens"
+      gender: "Women"
+      pagination:
+        type: scroll
+        scroll_pause: 3
+        max_scrolls: 60
+
+  product_link_selector: "#product-grid a[href*='/products/']"
+
+  code_extraction:
+    source: "attribute"
+    # Seiko listing cards have data-sku on a parent element of the product link
+    selector: "[data-sku]"
+    attribute: "data-sku"
+    normalize: "uppercase"
+
+driver:
+  type: undetected
+  use_webdriver_manager: true
+  start_maximized: true
+  first_load_wait: 15
+  page_load_wait: 5
+
+anti_bot:
+  random_delay_min: 3
+  random_delay_max: 6
+  slow_scroll: true                  # Confirmed: original scraper scrolled to load all products
+  scroll_pause: 3.0
+
+pre_scrape_actions: []
+
+selectors:
+
+  title:
+    # seikousa.com is Shopify — product title typically in .product__title
+    # Confirmed SKU in: <span class="bls__sku-value">SRPL61</span>
+    # Title appears to use product JSON data - using Shopify standard selector
+    - ".product__title"
+    - "h1.product-title"
+    - "h1.title"
+
+  price:
+    - "span.price"                   # Confirmed: <span class="price">$550.00</span>
+    - ".bls__product-price .price"
+
+  sku:
+    - ".bls__sku-value"              # Confirmed: <span class="bls__sku-value">SRPL61</span>
+    - ".bls__product-sku span"
+
+  description:
+    - ".product__description"
+    - ".product-description"
+
+  features:
+    # Confirmed: <ul class="product-features-list"><li>...</li></ul>
+    - "ul.product-features-list li"
+    - ".product-features-list li"
+    - ".product__description li"    # fallback
+
+  color: []
+
+image_extraction:
+  # Seiko USA (Shopify): images in BLS product media, data-src on wrapper divs
+  # Confirmed: data-src="//seikousa.com/cdn/shop/files/SRPL61_1.png?v=..."
+  method: dom
+  dom_selectors:
+    - ".bls__prod-media[data-src]"   # Confirmed: wrapper div has data-src with full URL
+    - ".product-single__media-wrapper[data-src]"
+  dom_attribute: data-src            # Full URL on the wrapper div
+  magento_json: false
+  exclude_keywords:
+    - width=165
+    - width=360
+    - mobile                         # Skip mobile-specific duplicates
+  url_cleanup:
+    strip_query_params: false        # Keep ?v= version param for cache busting
+
+image_download:
+  use_session_cookies: false
+  referer: "https://seikousa.com/"
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+
+# ---------------------------------------------------------------------------
+# Spec extraction — drives product_scraper._extract_specs()
+# Two separate sections on seikousa.com product pages:
+#
+# 1) Additional Features: .feature-item > .feature-label + .feature-value
+#    e.g. Case Material, Water Resistance, Diameter, Lug Width, Strap, Movement
+#
+# 2) Technical Data: .techdata-grid > .label + .value (siblings, NOT parent-child)
+#    e.g. Diameter, Thickness, Length, Dial Color, Gender, Crystal Material
+#    Note: the Movement block only has .value divs (no .label), so we skip those.
+# ---------------------------------------------------------------------------
+spec_extraction:
+  type: seiko_dual               # custom type handled in product_scraper
+
+spec_table:
+  header: "Item Specification"
+  extraction_type: row
+  row_selector: ".feature-item, .techdata-grid > div" 
+  key_selector: ".feature-label, .label"
+  value_selector: ".feature-value, .value"
+  rows:
+    - label: "Brand"
+      type: static
+      value: "Seiko"
+    - label: "Model"
+      type: scraped
+      field: sku
+    - label: "Movement"
+      type: spec
+      spec_key: "Movement"
+    - label: "Case Material"
+      type: spec
+      spec_key: "Case Material"
+    - label: "Diameter"
+      type: spec
+      spec_key: "Diameter"
+    - label: "Thickness"
+      type: spec
+      spec_key: "Thickness"
+    - label: "Water Resistance"
+      type: spec
+      spec_key: "Water Resistance"
+    - label: "Lug Width"
+      type: spec
+      spec_key: "Lug Width"
+    - label: "Strap"
+      type: spec
+      spec_key: "Strap"
+    - label: "Dial Color"
+      type: spec
+      spec_key: "Dial Color"
+    - label: "Crystal"
+      type: spec
+      spec_key: "Crystal Material"
+    - label: "Features"
+      type: features_list
+      field: features
+
+shopify:
+  vendor: "Seiko"
+  product_type: "Watch"
+  status_on_import: draft
+  default_tags:
+    - seiko
+    - japanese-watch
+    - watches
+  source_url_metafield: "custom.source_url"

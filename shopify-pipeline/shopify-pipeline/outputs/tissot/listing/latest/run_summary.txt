@@ -1,0 +1,28 @@
+============================================================
+SwiftCommerce Pipeline — Run Summary
+============================================================
+Brand        : tissot
+Mode         : listing
+Timestamp    : 20260311_180903
+Runtime      : 2689.34s
+
+--- Counts ---
+URLs collected       : 434
+New URLs             : 46
+Products scraped     : 46
+Products exported    : 0
+Images downloaded    : 207
+Images processed     : 207
+
+--- Inventory ---
+Catalog total        : 0
+New this run         : 0
+Updated this run     : 0
+
+--- Events ---
+[2026-03-11 18:11:35] Primary collection: 434 URLs collected, 434 with product codes
+[2026-03-11 18:13:29] Men collection (https://www.tissotwatches.com/en-us/men.html): 320 unique URLs
+[2026-03-11 18:14:51] Women collection (https://www.tissotwatches.com/en-us/women.html): 207 unique URLs
+[2026-03-11 18:14:51] Gender assignment: 227 Men, 115 Women, 92 Unisex, 0 unknown
+[2026-03-11 18:14:52] Deduplication: 434 scraped → 46 new, 388 existing (matched by URL: 387, by SKU: 1)
+============================================================

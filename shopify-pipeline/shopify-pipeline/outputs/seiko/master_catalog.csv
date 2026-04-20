@@ -1,0 +1,4 @@
+handle,title,sku,price,vendor,type,tags,source_url,first_seen,last_seen,run_count,status
+seiko-ssc941,Seiko SSC941,SSC941,785.00,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/ssc941,20260309_123319,20260309_123319,1,active
+seiko-ssc929,Seiko SSC929,SSC929,750.00,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/ssc929,20260309_123319,20260309_123319,1,active
+seiko-ssc931,Seiko SSC931,SSC931,750.00,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/ssc931,20260309_123319,20260309_123319,1,active
