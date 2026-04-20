@@ -1,0 +1,26 @@
+brand: seiko
+mode: listing
+timestamp: 20260309_134320
+
+=== Counts ===
+urls_collected: 15
+new_urls: 0
+products_scraped: 0
+products_exported: 0
+images_downloaded: 0
+catalog_total: 0
+catalog_new: 0
+catalog_updated: 0
+
+=== Events ===
+[2026-03-09 13:45:50] Primary collection: 250 URLs collected, 250 with product codes
+[2026-03-09 13:46:26] Men collection (https://seikousa.com/collections/mens): 348 URLs collected
+[2026-03-09 13:47:07] Women collection (https://seikousa.com/collections/womens): 92 URLs collected
+[2026-03-09 13:47:07] Gender assignment: 165 Men, 46 Women, 0 Unisex, 39 unknown
+[2026-03-09 13:47:07] WARNING: 39 products have unknown gender — not found in any gender collection: ['https://seikousa.com/collections/all/products/srpl61', 'https://seikousa.com/collections/all/products/srpl63', 'https://seikousa.com/collections/all/products/srpl64', 'https://seikousa.com/collections/all/products/ssk049', 'https://seikousa.com/collections/all/products/sre017', 'https://seikousa.com/collections/all/products/sre018', 'https://seikousa.com/collections/all/products/sre020', 'https://seikousa.com/collections/all/products/sur622', 'https://seikousa.com/collections/all/products/sur618', 'https://seikousa.com/collections/all/products/sur620']
+[2026-03-09 13:47:07] WARNING: 220 products found in gender collections but missing from primary collection — may be out of stock or unlisted: ['https://seikousa.com/collections/mens/products/srpk46', 'https://seikousa.com/collections/mens/products/ssk023', 'https://seikousa.com/collections/womens/products/sseh024', 'https://seikousa.com/collections/womens/products/sur592', 'https://seikousa.com/collections/mens/products/sur449', 'https://seikousa.com/collections/mens/products/srpd95', 'https://seikousa.com/collections/womens/products/sur591', 'https://seikousa.com/collections/mens/products/ssb455', 'https://seikousa.com/collections/womens/products/sur575', 'https://seikousa.com/collections/mens/products/srpe43']
+[2026-03-09 13:47:07] Collected 15 product URLs
+[2026-03-09 13:47:07] Found 0 new URLs after deduplication
+[2026-03-09 13:47:07] No new products found — exiting early
+
+runtime_seconds: 226.85
