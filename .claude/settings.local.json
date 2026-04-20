@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"from selenium import webdriver; print\\(''selenium ok''\\)\")",
+      "Bash(python3 -c \"from selenium import webdriver; print\\(''ok''\\)\")",
+      "Bash(where python)",
+      "Read(//mnt/**)",
+      "Read(//mnt/c/Users/anshi/AppData/Local/Programs/**)",
+      "Bash(cmd.exe /c \"where python\")",
+      "Bash(cmd.exe /c \"where python 2>&1\")",
+      "Bash(/c/Users/anshi/AppData/Local/Programs/Python/Python313/python.exe \"c:/Users/anshi/Swiftcommerce/swiftcommerce/shopify-pipeline/research_brands.py\")",
+      "Bash(/c/Users/anshi/AppData/Local/Programs/Python/Python313/python.exe \"c:/Users/anshi/Swiftcommerce/swiftcommerce/shopify-pipeline/research_brands_deep.py\")"
+    ]
+  }
+}

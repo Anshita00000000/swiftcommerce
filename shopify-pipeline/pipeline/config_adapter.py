@@ -63,7 +63,7 @@ def adapt(raw: dict) -> dict:
     Normalise a brand YAML config dict into the pipeline's internal format.
 
     Accepts any YAML style found in this project (template, tissot, hamilton,
-    seiko, wolf1834) and emits a single, consistent output shape regardless
+    seiko, wolf) and emits a single, consistent output shape regardless
     of which optional sections are present in the source file.
 
     Args:
