@@ -92,7 +92,7 @@ def run_listing(brand: str, config: dict, limit: int = None, skip_images: bool =
     try:
         driver = build_driver(config.get("anti_bot", {}))
         logger.info("Step 1/8: Collecting product URLs...")
-        all_urls, url_data_map = collect_urls(driver, config, limit=limit, ctx=ctx)
+        all_urls, url_data_map = collect_urls(driver, config, ctx=ctx)
         counts["urls_collected"] = len(all_urls)
     finally:
         if driver:
@@ -121,8 +121,13 @@ def run_listing(brand: str, config: dict, limit: int = None, skip_images: bool =
     driver = None
     try:
         driver = build_driver(config.get("anti_bot", {}))
-        logger.info(f"Step 3/8: Scraping {len(dedup_result['new'])} products...")
-        raw_products = scrape_products(driver, dedup_result["new"], config, ctx=ctx)
+        urls_to_scrape = dedup_result["new"][:limit] if limit else dedup_result["new"]
+        n_new = len(dedup_result["new"])
+        if limit and len(urls_to_scrape) < n_new:
+            logger.info(f"Step 3/8: {n_new} new products found, scraping {len(urls_to_scrape)} (limited)")
+        else:
+            logger.info(f"Step 3/8: Scraping {n_new} new products...")
+        raw_products = scrape_products(driver, urls_to_scrape, config, ctx=ctx)
         
         ctx.path("products_raw.json").write_text(
             json.dumps(raw_products, indent=2, ensure_ascii=False), encoding="utf-8"
