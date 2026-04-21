@@ -9,8 +9,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 # Your test URLs
 test_urls = [
-    {"url": "https://www.movado.com/us/en/shop-watches/bold-evolution-2.0-3601382.html", "sku": "3601382", "gender": "Women", "availability": ""},
-    {"url": "https://www.movado.com/us/en/shop-watches/bold-evolution-2.0-mini-3601328.html", "sku": "3601328", "gender": "Unisex", "availability": ""},
+    {"url": "https://www.movado.com/us/en/shop-watches/bold-evolution-2.0-3601382.html", "sku": "3601392", "gender": "Women", "availability": ""},
 ]
 
 # Load config
