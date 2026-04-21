@@ -416,23 +416,37 @@ def _paginate_load_more(
 ) -> List[Dict]:
     load_more_selector = pagination.get("load_more_selector", "")
     max_clicks         = pagination.get("max_clicks", 50)
-    scroll_pause       = pagination.get(
-        "scroll_pause", anti_bot.get("scroll_pause", 2.0)
-    )
 
     for click_num in range(max_clicks):
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(scroll_pause)
-        try:
-            btn = WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, load_more_selector))
+        # Scroll slowly toward the bottom in 300 px steps, checking for the
+        # button after each step — click it the moment it becomes visible.
+        btn = None
+        while True:
+            try:
+                candidate = driver.find_element(By.CSS_SELECTOR, load_more_selector)
+                if candidate.is_displayed() and candidate.is_enabled():
+                    btn = candidate
+                    break
+            except NoSuchElementException:
+                pass
+
+            current_bottom = driver.execute_script(
+                "return window.pageYOffset + window.innerHeight"
             )
-            driver.execute_script("arguments[0].click();", btn)
-            logger.debug("  Load more click #%d", click_num + 1)
-            time.sleep(_random_delay(anti_bot))
-        except (NoSuchElementException, TimeoutException):
-            logger.debug("  Load more button gone — all products loaded.")
+            page_height = driver.execute_script("return document.body.scrollHeight")
+            if current_bottom >= page_height:
+                break  # reached the bottom — button is genuinely gone
+
+            driver.execute_script("window.scrollBy(0, 300);")
+            time.sleep(0.3)
+
+        if btn is None:
+            logger.debug("  Load more button not found after full scroll — all products loaded.")
             break
+
+        driver.execute_script("arguments[0].click();", btn)
+        logger.debug("  Load more click #%d", click_num + 1)
+        time.sleep(_random_delay(anti_bot))
 
     pairs = _extract_links_with_codes(
         driver, selector, base_url, code_extraction, listing_avail_cfg
