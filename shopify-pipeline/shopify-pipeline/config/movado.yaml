@@ -11,22 +11,22 @@ url_collection:
   primary_url: "https://www.movado.com/us/en/shop-watches/shop-all-watches"
   primary_pagination:
     type: load_more
-    load_more_selector: "button[data-testid='button'].rounded-full"
-    max_clicks: 50
+    load_more_selector: "div.my-20 button[data-testid='button']"
+    max_clicks: 5
 
   gender_urls:
     - url: "https://www.movado.com/us/en/mens-designs"
       gender: "Men"
       pagination:
         type: load_more
-        load_more_selector: "button[data-testid='button'].rounded-full"
-        max_clicks: 30
+        load_more_selector: "div.my-20 button[data-testid='button']"
+        max_clicks: 3
     - url: "https://www.movado.com/us/en/womens-designs"
       gender: "Women"
       pagination:
         type: load_more
-        load_more_selector: "button[data-testid='button'].rounded-full"
-        max_clicks: 30
+        load_more_selector: "div.my-20 button[data-testid='button']"
+        max_clicks: 3
 
   # Selector for product links on the listing page
   product_link_selector: "a[href*='/us/en/shop-watches/'][href$='.html']"
@@ -50,7 +50,7 @@ anti_bot:
 # No pre-scrape actions needed as Movado's technical details are open by default
 pre_scrape_actions:
   - type: js_click_all
-    selector: "details[data-testid='accordion-item']:not([open]) summary"
+    selector: "details[data-testid='accordion-item'] summary"
 
 selectors:
   title: 
