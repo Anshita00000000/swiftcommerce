@@ -1,0 +1,1298 @@
+{
+  "meta": {
+    "brand": "Seiko",
+    "timestamp": "20260420_211728",
+    "total_urls": 214,
+    "with_sku": 214,
+    "men": 71,
+    "women": 31,
+    "unisex": 0,
+    "unknown_gender": 112
+  },
+  "urls": [
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk049",
+      "sku": "SSK049",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sseh021",
+      "sku": "SSEH021",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sseh023",
+      "sku": "SSEH023",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sseh024",
+      "sku": "SSEH024",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssc931",
+      "sku": "SSC931",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl61",
+      "sku": "SRPL61",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl63",
+      "sku": "SRPL63",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl64",
+      "sku": "SRPL64",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk037",
+      "sku": "SSK037",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk039",
+      "sku": "SSK039",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk041",
+      "sku": "SSK041",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk48",
+      "sku": "SRPK48",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk46",
+      "sku": "SRPK46",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre017",
+      "sku": "SRE017",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre018",
+      "sku": "SRE018",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre020",
+      "sku": "SRE020",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre007",
+      "sku": "SRE007",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre009",
+      "sku": "SRE009",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre010",
+      "sku": "SRE010",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk035",
+      "sku": "SSK035",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk036",
+      "sku": "SSK036",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk021",
+      "sku": "SSK021",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk019",
+      "sku": "SSK019",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk017",
+      "sku": "SSK017",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk005",
+      "sku": "SSK005",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur622",
+      "sku": "SUR622",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur618",
+      "sku": "SUR618",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur620",
+      "sku": "SUR620",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur595",
+      "sku": "SUR595",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur597",
+      "sku": "SUR597",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur605",
+      "sku": "SUR605",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur607",
+      "sku": "SUR607",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur608",
+      "sku": "SUR608",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur589",
+      "sku": "SUR589",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur591",
+      "sku": "SUR591",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur592",
+      "sku": "SUR592",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur588",
+      "sku": "SUR588",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl53",
+      "sku": "SRPL53",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl51",
+      "sku": "SRPL51",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl11",
+      "sku": "SRPL11",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl15",
+      "sku": "SRPL15",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe33",
+      "sku": "SRPE33",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpf03",
+      "sku": "SRPF03",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe43",
+      "sku": "SRPE43",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd37",
+      "sku": "SRPD37",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srp839",
+      "sku": "SRP839",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srp841",
+      "sku": "SRP841",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj13",
+      "sku": "SRPJ13",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl83",
+      "sku": "SRPL83",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl85",
+      "sku": "SRPL85",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl87",
+      "sku": "SRPL87",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl89",
+      "sku": "SRPL89",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk65",
+      "sku": "SRPK65",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk71",
+      "sku": "SRPK71",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk73",
+      "sku": "SRPK73",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur579",
+      "sku": "SUR579",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur581",
+      "sku": "SUR581",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur582",
+      "sku": "SUR582",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur558",
+      "sku": "SUR558",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur555",
+      "sku": "SUR555",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb451",
+      "sku": "SSB451",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb453",
+      "sku": "SSB453",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb455",
+      "sku": "SSB455",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur575",
+      "sku": "SUR575",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur565",
+      "sku": "SUR565",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/spb117",
+      "sku": "SPB117",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/spb210",
+      "sku": "SPB210",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/spb155",
+      "sku": "SPB155",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/spb249",
+      "sku": "SPB249",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk43",
+      "sku": "SRPK43",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe05",
+      "sku": "SRPE05",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe99",
+      "sku": "SRPE99",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl71",
+      "sku": "SRPL71",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl73",
+      "sku": "SRPL73",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl75",
+      "sku": "SRPL75",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl07",
+      "sku": "SRPL07",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl09",
+      "sku": "SRPL09",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk009",
+      "sku": "SSK009",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssa425",
+      "sku": "SSA425",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg03",
+      "sku": "SRPG03",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk025",
+      "sku": "SSK025",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl55",
+      "sku": "SRPL55",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl57",
+      "sku": "SRPL57",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl59",
+      "sku": "SRPL59",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk87",
+      "sku": "SRPK87",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk89",
+      "sku": "SRPK89",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk91",
+      "sku": "SRPK91",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk97",
+      "sku": "SRPK97",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk99",
+      "sku": "SRPK99",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl77",
+      "sku": "SRPL77",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk33",
+      "sku": "SRPK33",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb430",
+      "sku": "SSB430",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb427",
+      "sku": "SSB427",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg57",
+      "sku": "SRPG57",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe27",
+      "sku": "SRPE27",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk22",
+      "sku": "SRPK22",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk20",
+      "sku": "SRPK20",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk18",
+      "sku": "SRPK18",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd65",
+      "sku": "SRPD65",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd93",
+      "sku": "SRPD93",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssg010",
+      "sku": "SSG010",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssg021",
+      "sku": "SSG021",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssg022",
+      "sku": "SSG022",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssc700",
+      "sku": "SSC700",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srwz24",
+      "sku": "SRWZ24",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sne506",
+      "sku": "SNE506",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sne565",
+      "sku": "SNE565",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sfj007",
+      "sku": "SFJ007",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sfj005",
+      "sku": "SFJ005",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj81",
+      "sku": "SRPJ81",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj83",
+      "sku": "SRPJ83",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg27",
+      "sku": "SRPG27",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg29",
+      "sku": "SRPG29",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg31",
+      "sku": "SRPG31",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg41",
+      "sku": "SRPG41",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur531",
+      "sku": "SUR531",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur312",
+      "sku": "SUR312",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur322",
+      "sku": "SUR322",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe53",
+      "sku": "SRPE53",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe55",
+      "sku": "SRPE55",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe57",
+      "sku": "SRPE57",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre003",
+      "sku": "SRE003",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb446",
+      "sku": "SSB446",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur559",
+      "sku": "SUR559",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr049",
+      "sku": "SWR049",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr070",
+      "sku": "SWR070",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur356",
+      "sku": "SUR356",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur358",
+      "sku": "SUR358",
+      "gender": "Men",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr046",
+      "sku": "SWR046",
+      "gender": "Women",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssc941",
+      "sku": "SSC941",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk15",
+      "sku": "SRPK15",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssa459",
+      "sku": "SSA459",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk033",
+      "sku": "SSK033",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk001",
+      "sku": "SSK001",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk003",
+      "sku": "SSK003",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl13",
+      "sku": "SRPL13",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj93",
+      "sku": "SRPJ93",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe37",
+      "sku": "SRPE37",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe41",
+      "sku": "SRPE41",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe45",
+      "sku": "SRPE45",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe15",
+      "sku": "SRPE15",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpb77",
+      "sku": "SRPB77",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpb41",
+      "sku": "SRPB41",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpb43",
+      "sku": "SRPB43",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpb46",
+      "sku": "SRPB46",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj17",
+      "sku": "SRPJ17",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk37",
+      "sku": "SRPK37",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur578",
+      "sku": "SUR578",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl81",
+      "sku": "SRPL81",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk01",
+      "sku": "SRPK01",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpf77",
+      "sku": "SRPF77",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe93",
+      "sku": "SRPE93",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk013",
+      "sku": "SSK013",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk023",
+      "sku": "SSK023",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl79",
+      "sku": "SRPL79",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk29",
+      "sku": "SRPK29",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk31",
+      "sku": "SRPK31",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr093",
+      "sku": "SWR093",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr085",
+      "sku": "SWR085",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb429",
+      "sku": "SSB429",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj45",
+      "sku": "SRPJ45",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd51",
+      "sku": "SRPD51",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd59",
+      "sku": "SRPD59",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd79",
+      "sku": "SRPD79",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssg009",
+      "sku": "SSG009",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssc376",
+      "sku": "SSC376",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpf53",
+      "sku": "SRPF53",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur549",
+      "sku": "SUR549",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj85",
+      "sku": "SRPJ85",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srph29",
+      "sku": "SRPH29",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srph33",
+      "sku": "SRPH33",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg35",
+      "sku": "SRPG35",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg37",
+      "sku": "SRPG37",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg39",
+      "sku": "SRPG39",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur525",
+      "sku": "SUR525",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur527",
+      "sku": "SUR527",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur314",
+      "sku": "SUR314",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur636",
+      "sku": "SUR636",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur633",
+      "sku": "SUR633",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur343",
+      "sku": "SUR343",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur449",
+      "sku": "SUR449",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur450",
+      "sku": "SUR450",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe51",
+      "sku": "SRPE51",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre004",
+      "sku": "SRE004",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb397",
+      "sku": "SSB397",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb405",
+      "sku": "SSB405",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur503",
+      "sku": "SUR503",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sut068",
+      "sku": "SUT068",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur392",
+      "sku": "SUR392",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur394",
+      "sku": "SUR394",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur562",
+      "sku": "SUR562",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur487",
+      "sku": "SUR487",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur414",
+      "sku": "SUR414",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srk047",
+      "sku": "SRK047",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srk050",
+      "sku": "SRK050",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur444",
+      "sku": "SUR444",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur442",
+      "sku": "SUR442",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur355",
+      "sku": "SUR355",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur360",
+      "sku": "SUR360",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur440",
+      "sku": "SUR440",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur430",
+      "sku": "SUR430",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur432",
+      "sku": "SUR432",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur434",
+      "sku": "SUR434",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur361",
+      "sku": "SUR361",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur363",
+      "sku": "SUR363",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr044",
+      "sku": "SWR044",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr048",
+      "sku": "SWR048",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srph87",
+      "sku": "SRPH87",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srph89",
+      "sku": "SRPH89",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/snkm97",
+      "sku": "SNKM97",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/snkn37",
+      "sku": "SNKN37",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb345",
+      "sku": "SSB345",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sne529",
+      "sku": "SNE529",
+      "gender": "",
+      "availability": ""
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/s23159",
+      "sku": "S23159",
+      "gender": "",
+      "availability": ""
+    }
+  ]
+}

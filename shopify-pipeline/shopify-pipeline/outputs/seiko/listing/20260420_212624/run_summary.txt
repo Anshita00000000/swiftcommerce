@@ -1,0 +1,29 @@
+============================================================
+SwiftCommerce Pipeline — Run Summary
+============================================================
+Brand        : seiko
+Mode         : listing
+Timestamp    : 20260420_212624
+Runtime      : 467.49s
+
+--- Counts ---
+URLs collected       : 214
+New URLs             : 7
+Products scraped     : 7
+Products exported    : 7
+Images downloaded    : 29
+Images processed     : 29
+
+--- Inventory ---
+Catalog total        : 10
+New this run         : 7
+Updated this run     : 0
+
+--- Events ---
+[2026-04-20 21:27:18] Primary collection: 214 URLs collected, 214 with product codes
+[2026-04-20 21:27:50] Men collection (https://seikousa.com/collections/mens): 71 unique URLs (142 raw, 71 scroll duplicates removed)
+[2026-04-20 21:28:13] Women collection (https://seikousa.com/collections/womens): 31 unique URLs (62 raw, 31 scroll duplicates removed)
+[2026-04-20 21:28:13] Gender assignment: 71 Men, 31 Women, 0 Unisex, 112 unknown
+[2026-04-20 21:28:13] WARNING: 112 products have unknown gender (not found in any gender collection): ['https://seikousa.com/collections/all/products/ssk049', 'https://seikousa.com/collections/all/products/srpl61', 'https://seikousa.com/collections/all/products/srpl63', 'https://seikousa.com/collections/all/products/srpl64', 'https://seikousa.com/collections/all/products/srpl53', 'https://seikousa.com/collections/all/products/srpl51', 'https://seikousa.com/collections/all/products/srpl11', 'https://seikousa.com/collections/all/products/srpl15', 'https://seikousa.com/collections/all/products/srpe33', 'https://seikousa.com/collections/all/products/srpf03']
+[2026-04-20 21:28:14] Deduplication: 214 scraped → 7 new, 207 existing (matched by URL: 207, by SKU: 0)
+============================================================

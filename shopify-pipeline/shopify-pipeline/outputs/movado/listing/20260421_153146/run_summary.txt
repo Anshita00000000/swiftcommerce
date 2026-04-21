@@ -1,0 +1,29 @@
+============================================================
+SwiftCommerce Pipeline — Run Summary
+============================================================
+Brand        : movado
+Mode         : listing
+Timestamp    : 20260421_153146
+Runtime      : 402.45s
+
+--- Counts ---
+URLs collected       : 25
+New URLs             : 25
+Products scraped     : 3
+Products exported    : 3
+Images downloaded    : 46
+Images processed     : 46
+
+--- Inventory ---
+Catalog total        : 27
+New this run         : 2
+Updated this run     : 1
+
+--- Events ---
+[2026-04-21 15:32:28] Primary collection: 25 URLs collected, 0 with product codes
+[2026-04-21 15:32:58] Men collection (https://www.movado.com/us/en/mens-designs): 26 unique URLs (56 raw, 30 scroll duplicates removed)
+[2026-04-21 15:33:29] Women collection (https://www.movado.com/us/en/womens-designs): 27 unique URLs (56 raw, 29 scroll duplicates removed)
+[2026-04-21 15:33:29] Gender assignment: 8 Men, 9 Women, 4 Unisex, 4 unknown
+[2026-04-21 15:33:29] WARNING: 4 products have unknown gender (not found in any gender collection): ['https://www.movado.com/us/en/shop-watches/museum-imperiale-0608054.html', 'https://www.movado.com/us/en/shop-watches/bold-fusion-chronograph-3601240.html', 'https://www.movado.com/us/en/shop-watches/bold-tr90-chronograph-3601421.html', 'https://www.movado.com/us/en/shop-watches/bold-evolution-2.0-3601422.html']
+[2026-04-21 15:33:29] Deduplication: 25 scraped → 25 new, 0 existing (matched by URL: 0, by SKU: 0)
+============================================================

@@ -7,27 +7,26 @@ display_name: "Movado"
 base_url: "https://www.movado.com"
 
 url_collection:
-  # Pass 1: Master List (The "Shop All" source)
+
   primary_url: "https://www.movado.com/us/en/shop-watches/shop-all-watches"
   primary_pagination:
     type: load_more
     load_more_selector: "div.my-20 button[data-testid='button']"
-    max_clicks: 30
+    max_clicks: 5
 
-  # Pass 2: Gender Identification
   gender_urls:
     - url: "https://www.movado.com/us/en/mens-designs"
       gender: "Men"
       pagination:
         type: load_more
         load_more_selector: "div.my-20 button[data-testid='button']"
-        max_clicks: 30
+        max_clicks: 3
     - url: "https://www.movado.com/us/en/womens-designs"
       gender: "Women"
       pagination:
         type: load_more
         load_more_selector: "div.my-20 button[data-testid='button']"
-        max_clicks: 30
+        max_clicks: 3
 
   # Selector for product links on the listing page
   product_link_selector: "a[href*='/us/en/shop-watches/'][href$='.html']"
@@ -49,7 +48,9 @@ anti_bot:
   scroll_pause: 2.5
 
 # No pre-scrape actions needed as Movado's technical details are open by default
-pre_scrape_actions: []
+pre_scrape_actions:
+  - type: js_click_all
+    selector: "details[data-testid='accordion-item'] summary"
 
 selectors:
   title: 
@@ -65,10 +66,9 @@ selectors:
     - ".description-main-wrapper .font-fontPrimary"
 
 spec_extraction:
-  # Strategy for Movado's grid of flex columns (h5 label + span value)
-  type: row
-  row_selector: "details.accordion-item[open] .grid .flex-col"
-  key_selector: "h5"
+  type: accordion
+  item_selector: "details[data-testid='accordion-item'] .flex-col"
+  label_selector: "h5"
   value_selector: "span"
 
 spec_table:
