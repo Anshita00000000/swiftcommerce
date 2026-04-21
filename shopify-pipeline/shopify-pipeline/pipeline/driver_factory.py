@@ -96,7 +96,7 @@ def build_driver(anti_bot: dict = None) -> uc.Chrome:
         logger.warning("Chrome binary not found — letting undetected_chromedriver auto-detect.")
 
     # 2. FORCE the version here so it doesn't get overwritten or set to None
-    version_main = 144 
+    version_main = 147
     logger.info(f"Forcing ChromeDriver version: {version_main}")
 
     # 3. Now pass this to the driver

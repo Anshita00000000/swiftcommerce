@@ -2,3 +2,10 @@ handle,title,sku,price,vendor,type,tags,source_url,first_seen,last_seen,run_coun
 seiko-ssc941,Seiko SSC941,SSC941,785.00,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/ssc941,20260309_123319,20260309_123319,1,active
 seiko-ssc929,Seiko SSC929,SSC929,750.00,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/ssc929,20260309_123319,20260309_123319,1,active
 seiko-ssc931,Seiko SSC931,SSC931,750.00,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/ssc931,20260309_123319,20260309_123319,1,active
+seiko-sseh021,Seiko SSEH021,SSEH021,370,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/sseh021,20260420_212624,20260420_212624,1,active
+seiko-sseh023,Seiko SSEH023,SSEH023,410,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/sseh023,20260420_212624,20260420_212624,1,active
+seiko-srpl83,Seiko SRPL83,SRPL83,450,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/srpl83,20260420_212624,20260420_212624,1,active
+seiko-srpl85,Seiko SRPL85,SRPL85,450,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/srpl85,20260420_212624,20260420_212624,1,active
+seiko-srpl87,Seiko SRPL87,SRPL87,400,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/srpl87,20260420_212624,20260420_212624,1,active
+seiko-srpl89,Seiko SRPL89,SRPL89,400,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/srpl89,20260420_212624,20260420_212624,1,active
+seiko-ssb345,Seiko SSB345,SSB345,335,Seiko,Watch,"seiko, japanese-watch, watches",https://seikousa.com/products/ssb345,20260420_212624,20260420_212624,1,active

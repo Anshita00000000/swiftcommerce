@@ -1,0 +1,868 @@
+{
+  "meta": {
+    "total_scraped": 214,
+    "new": 0,
+    "existing": 214,
+    "matched_by_url": 214,
+    "matched_by_sku": 0
+  },
+  "new_urls": [],
+  "existing": [
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk049",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sseh021",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sseh023",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sseh024",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssc931",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl61",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl63",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl64",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk037",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk039",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk041",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk48",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk46",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre017",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre018",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre020",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre007",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre009",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre010",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk035",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk036",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk021",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk019",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk017",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk005",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur622",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur618",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur620",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur595",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur597",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur605",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur607",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur608",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur589",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur591",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur592",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur588",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl53",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl51",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl11",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl15",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe33",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpf03",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe43",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd37",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srp839",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srp841",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj13",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl83",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl85",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl87",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl89",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk65",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk71",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk73",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur579",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur581",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur582",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur558",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur555",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb451",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb453",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb455",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur575",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur565",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/spb117",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/spb210",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/spb155",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/spb249",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk43",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe05",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe99",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl71",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl73",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl75",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl07",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl09",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk009",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssa425",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg03",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk025",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl55",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl57",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl59",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk87",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk89",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk91",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk97",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk99",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl77",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk33",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb430",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb427",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg57",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe27",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk22",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk20",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk18",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd65",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd93",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssg010",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssg021",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssg022",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssc700",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srwz24",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sne506",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sne565",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sfj007",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sfj005",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj81",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj83",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg27",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg29",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg31",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg41",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur531",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur312",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur322",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe53",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe55",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe57",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre003",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb446",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur559",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr049",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr070",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur356",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur358",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr046",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssc941",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk15",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssa459",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk033",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk001",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk003",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl13",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj93",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe37",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe41",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe45",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe15",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpb77",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpb41",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpb43",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpb46",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj17",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk37",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur578",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl81",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk01",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpf77",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe93",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk013",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssk023",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpl79",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk29",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpk31",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr093",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr085",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb429",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj45",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd51",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd59",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpd79",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssg009",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssc376",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpf53",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur549",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpj85",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srph29",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srph33",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg35",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg37",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpg39",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur525",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur527",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur314",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur636",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur633",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur343",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur449",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur450",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srpe51",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sre004",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb397",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb405",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur503",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sut068",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur392",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur394",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur562",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur487",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur414",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srk047",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srk050",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur444",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur442",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur355",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur360",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur440",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur430",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur432",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur434",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur361",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sur363",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr044",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/swr048",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srph87",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/srph89",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/snkm97",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/snkn37",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/ssb345",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/sne529",
+      "match_method": "url"
+    },
+    {
+      "url": "https://seikousa.com/collections/all/products/s23159",
+      "match_method": "url"
+    }
+  ]
+}
