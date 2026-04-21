@@ -8,21 +8,22 @@ Folder layout
 ─────────────
   Listing:
     outputs/{brand}/listing/{timestamp}/
-    outputs/{brand}/listing/{timestamp}/images/   ← per-product image folders
-    outputs/{brand}/listing/latest/               ← copy of the most recent run
-                                                     (images/ excluded — too large)
+    outputs/{brand}/listing/latest/   ← copy of the most recent run
   Drafting:
     outputs/{brand}/drafting/{timestamp}/
+  Images (brand-level, shared across all runs):
+    outputs/{brand}/images/raw/{handle}/
+    outputs/{brand}/images/processed/{handle}/
 
 Public API
 ──────────
   RunContext(brand, mode)
-  .path(filename)           → Path   inside run folder; creates parents
-  .images_path(handle)      → Path   {run_folder}/images/{handle}/; creates it
-  .log_event(message)               append a timestamped line to the event log
-  .save_summary(counts)             write run_summary.txt to the run folder
-  .copy_to_latest()                 listing only — copy run folder → latest/
-                                    (skips images/ subdirectory)
+  .path(filename)                    → Path  inside run folder; creates parents
+  .brand_images_raw_path(handle)     → Path  outputs/{brand}/images/raw/{handle}/
+  .brand_images_processed_path(handle) → Path outputs/{brand}/images/processed/{handle}/
+  .log_event(message)                append a timestamped line to the event log
+  .save_summary(counts)              write run_summary.txt to the run folder
+  .copy_to_latest()                  listing only — copy run folder → latest/
 
 Expected keys in the counts dict passed to save_summary()
 ─────────────────────────────────────────────────────────
@@ -118,10 +119,6 @@ class RunContext:
         self._run_folder = Path("outputs") / brand / mode / self.timestamp
         self._run_folder.mkdir(parents=True, exist_ok=True)
 
-        # Pre-create the images sub-folder for listing runs
-        if mode == "listing":
-            (self._run_folder / "images").mkdir(exist_ok=True)
-
         self._events: list = []
 
         # Attributes that other modules may write directly for summary use.
@@ -147,16 +144,25 @@ class RunContext:
         p.parent.mkdir(parents=True, exist_ok=True)
         return p
 
-    def images_path(self, handle: str) -> Path:
+    def brand_images_raw_path(self, handle: str) -> Path:
         """
-        Return the per-product image directory: {run_folder}/images/{handle}/
+        Return the brand-level raw image directory for a product handle:
+          outputs/{brand}/images/raw/{handle}/
         Creates the directory if it does not exist.
-
-        Used by image_downloader to decide where to save files.
         """
-        img_dir = self._run_folder / "images" / handle
-        img_dir.mkdir(parents=True, exist_ok=True)
-        return img_dir
+        p = Path("outputs") / self.brand / "images" / "raw" / handle
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+
+    def brand_images_processed_path(self, handle: str) -> Path:
+        """
+        Return the brand-level processed image directory for a product handle:
+          outputs/{brand}/images/processed/{handle}/
+        Creates the directory if it does not exist.
+        """
+        p = Path("outputs") / self.brand / "images" / "processed" / handle
+        p.mkdir(parents=True, exist_ok=True)
+        return p
 
     # ------------------------------------------------------------------
     # Event log
@@ -313,10 +319,8 @@ class RunContext:
         previous latest.
 
         Only runs in listing mode — drafting runs are not promoted to latest.
-
-        The images/ subdirectory is intentionally excluded: it can be many
-        gigabytes and does not need to live in latest/ for downstream tooling
-        (CSV files and JSON metadata are sufficient).
+        Images are stored at the brand level (outputs/{brand}/images/) and are
+        not part of the run folder, so no exclusion is needed.
         """
         if self.mode != "listing":
             return
@@ -326,19 +330,14 @@ class RunContext:
             shutil.rmtree(latest_dir)
         latest_dir.mkdir(parents=True, exist_ok=True)
 
-        images_subdir = self._run_folder / "images"
-
         for item in self._run_folder.iterdir():
-            # Skip the images directory — too large for latest/
-            if item.resolve() == images_subdir.resolve():
-                continue
             dest = latest_dir / item.name
             if item.is_dir():
                 shutil.copytree(item, dest)
             else:
                 shutil.copy2(item, dest)
 
-        logger.debug("Copied run folder (no images) → %s", latest_dir)
+        logger.debug("Copied run folder → %s", latest_dir)
 
 
 # ---------------------------------------------------------------------------

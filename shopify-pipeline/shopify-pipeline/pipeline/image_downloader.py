@@ -1,11 +1,11 @@
 """
 image_downloader.py
 
-Downloads product images for one product into the run's timestamped folder.
+Downloads product images into the brand-level images folder.
 
 Output path
 ───────────
-  outputs/{brand}/listing/{timestamp}/images/{handle}/raw/
+  outputs/{brand}/images/raw/{handle}/
 
 Re-run safe: if the file already exists it is skipped without re-downloading.
 
@@ -48,8 +48,8 @@ def download_images(
     Args:
         image_urls: List of image URLs (already normalized to https://).
         handle:     Shopify product handle — used as the per-product folder name.
-        ctx:        RunContext instance; provides ctx.images_path(handle) for the
-                    output directory root.
+        ctx:        RunContext instance; provides ctx.brand_images_raw_path(handle)
+                    for the output directory.
         config:     Adapted config dict; anti_bot.image_delay controls the
                     per-download pause (falls back to anti_bot.page_delay, then 0.5s).
 
@@ -65,9 +65,7 @@ def download_images(
         anti_bot.get("page_delay", 0.5))
     )
 
-    # Raw images live in a raw/ subfolder inside the per-handle image directory.
-    raw_dir: Path = ctx.images_path(handle) / "raw"
-    raw_dir.mkdir(parents=True, exist_ok=True)
+    raw_dir: Path = ctx.brand_images_raw_path(handle)
 
     local_paths: List[str] = []
 

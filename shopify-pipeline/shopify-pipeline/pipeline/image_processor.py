@@ -6,7 +6,7 @@ ready for Shopify upload.
 
 Output path
 ───────────
-  outputs/{brand}/listing/{timestamp}/images/{handle}/processed/
+  outputs/{brand}/images/processed/{handle}/
 
 Filename convention: {sku}_{n}.webp  (n is 1-indexed)
 If no sku is supplied, handle is used instead.
@@ -66,8 +66,8 @@ def process_images(
     Args:
         raw_paths: Local file paths returned by image_downloader.download_images().
         handle:    Shopify product handle — used to locate the processed/ folder
-                   via ctx.images_path(handle).
-        ctx:       RunContext instance; provides ctx.images_path(handle).
+                   via ctx.brand_images_processed_path(handle).
+        ctx:       RunContext instance; provides ctx.brand_images_processed_path(handle).
         sku:       Product SKU used as the filename prefix.  Falls back to handle
                    when empty.
 
@@ -85,8 +85,7 @@ def process_images(
 
     name_prefix = sku.strip() if sku.strip() else handle
 
-    processed_dir: Path = ctx.images_path(handle) / "processed"
-    processed_dir.mkdir(parents=True, exist_ok=True)
+    processed_dir: Path = ctx.brand_images_processed_path(handle)
 
     output_paths: List[str] = []
     n = 1  # 1-indexed output counter (only increments on success)
