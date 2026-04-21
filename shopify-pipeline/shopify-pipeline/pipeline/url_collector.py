@@ -416,8 +416,13 @@ def _paginate_load_more(
 ) -> List[Dict]:
     load_more_selector = pagination.get("load_more_selector", "")
     max_clicks         = pagination.get("max_clicks", 50)
+    scroll_pause       = pagination.get(
+        "scroll_pause", anti_bot.get("scroll_pause", 2.0)
+    )
 
     for click_num in range(max_clicks):
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(scroll_pause)
         try:
             btn = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, load_more_selector))
