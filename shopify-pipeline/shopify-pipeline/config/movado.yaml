@@ -10,24 +10,24 @@ url_collection:
   # Pass 1: Master List (The "Shop All" source)
   primary_url: "https://www.movado.com/us/en/shop-watches/shop-all-watches"
   primary_pagination:
-    type: infinite_scroll
-    scroll_pause: 3.0
-    max_scrolls: 60
+    type: load_more
+    load_more_selector: "div.my-20 button[data-testid='button']"
+    max_clicks: 30
 
   # Pass 2: Gender Identification
   gender_urls:
     - url: "https://www.movado.com/us/en/mens-designs"
       gender: "Men"
       pagination:
-        type: infinite_scroll
-        scroll_pause: 3.0
-        max_scrolls: 40
+        type: load_more
+        load_more_selector: "div.my-20 button[data-testid='button']"
+        max_clicks: 30
     - url: "https://www.movado.com/us/en/womens-designs"
       gender: "Women"
       pagination:
-        type: infinite_scroll
-        scroll_pause: 3.0
-        max_scrolls: 40
+        type: load_more
+        load_more_selector: "div.my-20 button[data-testid='button']"
+        max_clicks: 30
 
   # Selector for product links on the listing page
   product_link_selector: "a[href*='/us/en/shop-watches/'][href$='.html']"

@@ -438,7 +438,7 @@ def _paginate_load_more(
                 break  # reached the bottom — button is genuinely gone
 
             driver.execute_script("window.scrollBy(0, 300);")
-            time.sleep(0.3)
+            time.sleep(random.uniform(0.6, 1.0))
 
         if btn is None:
             logger.debug("  Load more button not found after full scroll — all products loaded.")
