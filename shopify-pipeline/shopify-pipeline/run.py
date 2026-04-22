@@ -6,6 +6,7 @@ Usage:
     python run.py --brand tissot --mode listing
     python run.py --brand tissot --mode drafting
     python run.py --brand tissot --mode listing --limit 5 --skip-images
+    python run.py --brand tissot --mode listing --skip-url-collection
 """
 
 import argparse
@@ -16,6 +17,7 @@ import sys
 import yaml
 from datetime import date
 from pathlib import Path
+from typing import Dict, List, Tuple
 
 from pipeline.config_adapter import adapt
 
@@ -56,7 +58,13 @@ def load_config(brand: str) -> dict:
 # LISTING mode
 # ---------------------------------------------------------------------------
 
-def run_listing(brand: str, config: dict, limit: int = None, skip_images: bool = False) -> None:
+def run_listing(
+    brand: str,
+    config: dict,
+    limit: int = None,
+    skip_images: bool = False,
+    skip_url_collection: bool = False,
+) -> None:
     from pipeline.run_context import RunContext
     from pipeline.driver_factory import build_driver
     from pipeline.url_collector import collect_urls
@@ -87,28 +95,44 @@ def run_listing(brand: str, config: dict, limit: int = None, skip_images: bool =
         "catalog_updated": 0,
     }
 
-    # Step 2 — Collect URLs
-    driver = None
-    try:
-        driver = build_driver(config.get("anti_bot", {}))
-        logger.info("Step 1/8: Collecting product URLs...")
-        all_urls, url_data_map = collect_urls(driver, config, ctx=ctx)
+    # Step 2 — Collect URLs + Deduplicate
+    if skip_url_collection:
+        logger.info("Step 1/8: --skip-url-collection: loading URLs from latest run...")
+        try:
+            all_urls, url_data_map, dedup_result = _load_latest_run(brand)
+        except FileNotFoundError as e:
+            logger.error(f"Cannot skip URL collection: {e}")
+            ctx.save_summary(counts)
+            ctx.copy_to_latest()
+            return
         counts["urls_collected"] = len(all_urls)
-    finally:
-        if driver:
-            driver.quit()
+        counts["new_urls"] = len(dedup_result["new"])
+        logger.info(
+            f"  Loaded {len(all_urls)} total URLs, "
+            f"{len(dedup_result['new'])} marked as new from latest run"
+        )
+    else:
+        driver = None
+        try:
+            driver = build_driver(config.get("anti_bot", {}))
+            logger.info("Step 1/8: Collecting product URLs...")
+            all_urls, url_data_map = collect_urls(driver, config, ctx=ctx)
+            counts["urls_collected"] = len(all_urls)
+        finally:
+            if driver:
+                driver.quit()
 
-    if not all_urls:
-        logger.warning("No URLs collected — exiting.")
-        ctx.log_event("No URLs collected — exiting early")
-        ctx.save_summary(counts)
-        ctx.copy_to_latest()
-        return
+        if not all_urls:
+            logger.warning("No URLs collected — exiting.")
+            ctx.log_event("No URLs collected — exiting early")
+            ctx.save_summary(counts)
+            ctx.copy_to_latest()
+            return
 
-    # Step 3 — Deduplicate
-    logger.info("Step 2/8: Deduplicating against Shopify export...")
-    dedup_result = find_new_urls(url_data_map, brand, ctx=ctx)
-    counts["new_urls"] = len(dedup_result["new"])
+        # Step 3 — Deduplicate
+        logger.info("Step 2/8: Deduplicating against Shopify export...")
+        dedup_result = find_new_urls(url_data_map, brand, ctx=ctx)
+        counts["new_urls"] = len(dedup_result["new"])
 
     if not dedup_result["new"]:
         logger.info("No new products found. Nothing to scrape.")
@@ -128,7 +152,7 @@ def run_listing(brand: str, config: dict, limit: int = None, skip_images: bool =
         else:
             logger.info(f"Step 3/8: Scraping {n_new} new products...")
         raw_products = scrape_products(driver, urls_to_scrape, config, ctx=ctx)
-        
+
         ctx.path("products_raw.json").write_text(
             json.dumps(raw_products, indent=2, ensure_ascii=False), encoding="utf-8"
         )
@@ -153,14 +177,27 @@ def run_listing(brand: str, config: dict, limit: int = None, skip_images: bool =
             images = raw.get("images", [])
             if images:
                 handle = _url_to_handle(source_url)
+
+                # Skip entirely if this product's processed images already exist
+                processed_check = (
+                    Path("outputs") / brand / "images" / "processed" / handle
+                )
+                if processed_check.exists():
+                    existing_webp = sorted(processed_check.glob("*.webp"))
+                    if existing_webp:
+                        logger.debug("  [img] %s: already processed, skipping", handle)
+                        image_map[source_url] = [str(p) for p in existing_webp]
+                        counts["images_processed"] += len(existing_webp)
+                        continue
+
                 raw_paths = download_images(
                     image_urls=images,
                     handle=handle,
                     ctx=ctx,
-                    config=config
+                    config=config,
                 )
                 processed_paths = process_images(raw_paths, handle, ctx, sku=raw.get("sku", ""))
-                
+
                 # Prefer processed webp; fallback to raw paths if processing failed
                 image_map[source_url] = processed_paths if processed_paths else raw_paths
                 counts["images_downloaded"] += len(raw_paths)
@@ -268,10 +305,90 @@ def run_drafting(brand: str, config: dict, limit: int = None) -> None:
 
 def _url_to_handle(url: str) -> str:
     from slugify import slugify
-    # Get the last part of the URL (the slug)
     segment = url.rstrip("/").split("/")[-1]
-    # Clean it up for Shopify
     return slugify(segment) or slugify(url)
+
+
+def _norm_url(url: str) -> str:
+    """Normalize a URL: force https, strip trailing slash."""
+    url = url.strip()
+    if url.startswith("//"):
+        url = "https:" + url
+    elif url.startswith("http://"):
+        url = "https://" + url[7:]
+    return url.rstrip("/")
+
+
+def _load_latest_run(brand: str) -> Tuple[List[str], Dict, Dict]:
+    """
+    Load URL collection and dedup results from the latest listing run.
+
+    Used by --skip-url-collection to bypass URL collection and deduplication.
+
+    Returns:
+        (all_urls, url_data_map, dedup_result) — same shapes as what
+        collect_urls() and find_new_urls() normally return.
+
+    Raises:
+        FileNotFoundError if url_collection.json or dedup_result.json are
+        missing from outputs/{brand}/listing/latest/.
+    """
+    latest_dir = Path("outputs") / brand / "listing" / "latest"
+    url_col_path = latest_dir / "url_collection.json"
+    dedup_path   = latest_dir / "dedup_result.json"
+
+    if not url_col_path.exists():
+        raise FileNotFoundError(
+            f"url_collection.json not found in {latest_dir}. "
+            "Run without --skip-url-collection first."
+        )
+    if not dedup_path.exists():
+        raise FileNotFoundError(
+            f"dedup_result.json not found in {latest_dir}. "
+            "Run without --skip-url-collection first."
+        )
+
+    url_collection = json.loads(url_col_path.read_text(encoding="utf-8"))
+    dedup_data     = json.loads(dedup_path.read_text(encoding="utf-8"))
+
+    # Rebuild url_data_map from url_collection.json
+    url_data_map: Dict = {}
+    all_urls: List[str] = []
+    for entry in url_collection.get("urls", []):
+        raw_url = entry["url"]
+        norm    = _norm_url(raw_url)
+        all_urls.append(norm)
+        url_data_map[norm] = {
+            "url":          raw_url,
+            "sku":          entry.get("sku", ""),
+            "gender":       entry.get("gender", ""),
+            "availability": entry.get("availability", ""),
+        }
+
+    # Rebuild dedup_result["new"] using the saved new_urls list
+    new_url_set = {_norm_url(u) for u in dedup_data.get("new_urls", [])}
+    new_entries = [
+        {
+            "url":          url_data_map[norm]["url"],
+            "sku":          url_data_map[norm]["sku"],
+            "gender":       url_data_map[norm]["gender"],
+            "match_method": None,
+        }
+        for norm in all_urls
+        if norm in new_url_set
+    ]
+
+    dedup_result = {
+        "new":      new_entries,
+        "existing": [],
+        "summary":  {
+            "total_scraped": len(url_data_map),
+            "new":           len(new_entries),
+            "existing":      len(url_data_map) - len(new_entries),
+        },
+    }
+
+    return all_urls, url_data_map, dedup_result
 
 # ---------------------------------------------------------------------------
 # Main
@@ -283,10 +400,18 @@ def main() -> None:
     parser.add_argument("--mode", required=True, choices=["listing", "drafting"])
     parser.add_argument("--limit", type=int, default=None, help="Limit URLs for testing")
     parser.add_argument("--skip-images", action="store_true", help="Skip image processing")
+    parser.add_argument(
+        "--skip-url-collection",
+        action="store_true",
+        help=(
+            "Skip URL collection and deduplication; reuse new_urls from the "
+            "latest run stored in outputs/{brand}/listing/latest/."
+        ),
+    )
     args = parser.parse_args()
 
     setup_logging(args.brand)
-    
+
     # Set working directory to project root
     os.chdir(Path(__file__).parent)
 
@@ -297,7 +422,13 @@ def main() -> None:
         sys.exit(1)
 
     if args.mode == "listing":
-        run_listing(args.brand, config, limit=args.limit, skip_images=args.skip_images)
+        run_listing(
+            args.brand,
+            config,
+            limit=args.limit,
+            skip_images=args.skip_images,
+            skip_url_collection=args.skip_url_collection,
+        )
     elif args.mode == "drafting":
         run_drafting(args.brand, config, limit=args.limit)
 
